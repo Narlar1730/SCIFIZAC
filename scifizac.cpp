@@ -10,14 +10,9 @@
 #include <sstream>
 #include <time.h>
 //#include "board.h"
-
+#include "titlescreen.h"
 
 using namespace std;
-
-sf::Font font;
-
-bool MouseDown = false;
-
 
 void performKeyPress()
 {
@@ -43,17 +38,24 @@ void performKeyPress()
 
 bool updateGame()
 {
+	return true;
 }
 
 void drawBoard(sf::RenderWindow* window)
 {
+	cout << "drawing board\n";
+}
+
+void drawGameOver(sf::RenderWindow* window)
+{
 
 }
+
 
 void runGame(sf::RenderWindow* window){
 	bool gameRunning = true;
 
-	while (window->isOpen() && gameRunning)
+	while (gameRunning)
 	{
 		sf::Event event;
 		sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
@@ -61,6 +63,7 @@ void runGame(sf::RenderWindow* window){
 		// Handle Events
 		int  MouseX        = pixelPos.x;
 		int  MouseY        = pixelPos.y;
+		bool MouseDown = false;
 		//bool MouseReleased;
 		
 		while (window->pollEvent(event))
@@ -87,10 +90,52 @@ void runGame(sf::RenderWindow* window){
 
 }
 
-void drawGameOver(sf::RenderWindow* window)
+void openingScreen(sf::RenderWindow* window)
 {
-}
+	bool gameRunning = true;
+	char next;
+	while(gameRunning)
+	{
+		//Get Mouse information
+		sf::Event event;
+		sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
 
+		int MouseX = pixelPos.x;
+		int MouseY = pixelPos.y;
+		bool MouseDown = false;
+		bool MouseReleased = false;
+		while(window->pollEvent(event))
+		{
+			if(event.type == sf::Event::MouseButtonReleased)
+			{
+				MouseReleased = true;
+			}
+			else if(event.type == sf::Event::MouseButtonPressed)
+			{
+				MouseDown = true;
+			}
+		}
+		//Draw Graphics
+		next = DrawMainMenu(MouseX, MouseY, MouseReleased, window);
+		
+		//Next is the next screen at this stage, s is stay, so we change next to be anything else, we
+		//will have to stay on this screen
+		if(next != 's')
+		{
+			gameRunning = false;
+		}
+
+	}
+	//Figure out what the next screen is.
+	switch(next)
+	{
+		case 'p' :
+			break;
+		case 'q' :
+			cout << "User quit From main menu\n";
+			exit(0);
+	}
+}
 
 // Thread handling graphics and drawing
 void renderingThread(sf::RenderWindow* window)
@@ -98,6 +143,7 @@ void renderingThread(sf::RenderWindow* window)
 	window->setActive(true);
 	while(window->isOpen())
 	{
+		openingScreen(window);
 		runGame(window);
 		drawGameOver(window);	
 	}
@@ -122,9 +168,6 @@ int main()
     	//Launches Graphics in new thread
     	sf::Thread thread(&renderingThread, &window);
     	thread.launch();
-
-	//sf::Thread keyPresses(&performKeyPress);
-	//keyPresses.launch();
 
     	while (window.isOpen())
     	{
