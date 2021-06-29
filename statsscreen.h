@@ -104,16 +104,12 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 		b1.setFillColor(buttonColourHover);
 		if(MouseReleased)
 		{
-			outPut = 'p';
+			outPut='p';
 		}
 	}
 	else if(b2.getGlobalBounds().contains(mousex, mousey))
 	{
 		b2.setFillColor(buttonColourHover);
-		if(MouseReleased)
-		{
-			outPut = 'o';	
-		}
 	}
 	else if(b3.getGlobalBounds().contains(mousex, mousey))
 	{

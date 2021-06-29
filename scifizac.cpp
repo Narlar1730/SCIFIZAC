@@ -11,82 +11,16 @@
 #include <time.h>
 //#include "board.h"
 #include "titlescreen.h"
+#include "optionsscreen.h"
+#include "gamemain.h"
+#include "keyBoardManagement.h"
 
 using namespace std;
 
-void performKeyPress()
+void removeVectorDups(vector<char> vec)
 {
-
-	// Handle Key Press
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-	{
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::C))
-		{
-			cout << "User Quit Program\n";
-			exit(0);
-		}
-	}
-	
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-	{
-		cout << "User Quit Program\n";
-		exit(0);
-	}
-
-}
-
-bool updateGame()
-{
-	return true;
-}
-
-void drawBoard(sf::RenderWindow* window)
-{
-	cout << "drawing board\n";
-}
-
-void drawGameOver(sf::RenderWindow* window)
-{
-
-}
-
-
-void runGame(sf::RenderWindow* window){
-	bool gameRunning = true;
-
-	while (gameRunning)
-	{
-		sf::Event event;
-		sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
-		
-		// Handle Events
-		int  MouseX        = pixelPos.x;
-		int  MouseY        = pixelPos.y;
-		bool MouseDown = false;
-		//bool MouseReleased;
-		
-		while (window->pollEvent(event))
-		{
-			if(event.type == sf::Event::MouseButtonReleased)
-			{
-				cout << "Mouse Clicked at " << MouseX << " " << MouseY << "\n";
-				MouseDown = false;
-				//MouseReleased = true;
-			}
-			else if(event.type == sf::Event::MouseButtonPressed)
-			{
-				MouseDown = true;
-			}
-		}
-
-//		drawBoard(window, MouseX, MouseY, MouseReleased);
-//		drawButtons(window, MouseX, MouseY, MouseReleased);
-		gameRunning = updateGame();
-		drawBoard(window);
-		window->display();
-		window->clear();
-	}
+	sort(vec.begin(), vec.end());
+	vec.erase(unique(vec.begin(), vec.end()), vec.end());
 
 }
 
@@ -129,11 +63,16 @@ void openingScreen(sf::RenderWindow* window)
 	//Figure out what the next screen is.
 	switch(next)
 	{
+		case 'o':
+			statsScreen(window);
+			break;
 		case 'p' :
+			GameScreen(window);
 			break;
 		case 'q' :
 			cout << "User quit From main menu\n";
 			exit(0);
+			break;
 	}
 }
 
@@ -144,8 +83,6 @@ void renderingThread(sf::RenderWindow* window)
 	while(window->isOpen())
 	{
 		openingScreen(window);
-		runGame(window);
-		drawGameOver(window);	
 	}
 }
 

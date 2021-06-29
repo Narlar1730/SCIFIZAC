@@ -12,10 +12,52 @@
 
 
 using namespace std;
+char DrawStatsMenu(int, int, bool, sf::RenderWindow*);
+void openingScreen(sf::RenderWindow*);
 
-sf::Font font;
+void statsScreen(sf::RenderWindow* window)
+{
+	bool screenRunning = true;
+	char next;
+	while(screenRunning)
+	{
+	
+		sf::Event event;
+		sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
+		int MouseX = pixelPos.x;
+		int MouseY = pixelPos.y;
+		bool MouseDown = false;
+		bool MouseReleased = false;
 
-char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* window)
+		while(window->pollEvent(event))
+		{
+			if(event.type == sf::Event::MouseButtonReleased)
+			{
+				MouseReleased = true;
+			}
+			else if(event.type == sf::Event::MouseButtonPressed)
+			{
+				MouseDown = true;
+			}
+		}
+
+		next = DrawStatsMenu(MouseX, MouseY, MouseReleased, window);
+
+		if(next != 's')
+		{
+			screenRunning = false;
+		}
+	}
+
+	switch(next)
+	{
+		case 'b' :
+			openingScreen(window);
+			break;
+	}
+}
+
+char DrawStatsMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* window)
 {
 	//return s for stay on same screen and don't change screen. 
 	char outPut = 's';
@@ -36,7 +78,7 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	//Draw Title!
 	sf::Text title;
 	title.setFont(font);
-	title.setString("SCIFIZAAC");
+	title.setString("OPTIONS");
 	title.setCharacterSize(60);
 	title.setFillColor(titleTextColour);
 	title.setStyle(sf::Text::Bold);
@@ -51,7 +93,7 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	b1.setOutlineThickness(4);
 	sf::Text b1Text;
 	b1Text.setFont(font);
-	b1Text.setString("Play Game");
+	b1Text.setString("Need to be filled");
 	b1Text.setCharacterSize(40);
 	b1Text.setFillColor(black);
 	b1Text.setStyle(sf::Text::Bold);
@@ -65,7 +107,7 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	b2.setOutlineThickness(4);
 	sf::Text b2Text;
 	b2Text.setFont(font);
-	b2Text.setString("Options");
+	b2Text.setString("Sound? IDK");
 	b2Text.setCharacterSize(40);
 	b2Text.setFillColor(black);
 	b2Text.setStyle(sf::Text::Bold);
@@ -79,7 +121,7 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	b3.setOutlineThickness(4);
 	sf::Text b3Text;
 	b3Text.setFont(font);
-	b3Text.setString("Stats");
+	b3Text.setString("Some other option");
 	b3Text.setCharacterSize(40);
 	b3Text.setFillColor(black);
 	b3Text.setStyle(sf::Text::Bold);
@@ -93,27 +135,33 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	b4.setOutlineThickness(4);
 	sf::Text b4Text;
 	b4Text.setFont(font);
-	b4Text.setString("Quit :(");
+	b4Text.setString("NADA");
 	b4Text.setCharacterSize(40);
 	b4Text.setFillColor(black);
 	b4Text.setStyle(sf::Text::Bold);
 	b4Text.setPosition(580, 1380);
 
+	//Draw Back Button
+	sf::RectangleShape backButton(sf::Vector2f(150.f, 100.f));
+	backButton.setPosition(10, 10);
+	backButton.setFillColor(buttonColourNoHover);
+	backButton.setOutlineColor(black);
+	backButton.setOutlineThickness(4);
+	sf::Text backText;
+	backText.setFont(font);
+	backText.setString("BACK");
+	backText.setCharacterSize(40);
+	backText.setFillColor(black);
+	backText.setStyle(sf::Text::Bold);
+	backText.setPosition(15, 15);
+
 	if(b1.getGlobalBounds().contains(mousex, mousey))
 	{
 		b1.setFillColor(buttonColourHover);
-		if(MouseReleased)
-		{
-			outPut = 'p';
-		}
 	}
 	else if(b2.getGlobalBounds().contains(mousex, mousey))
 	{
 		b2.setFillColor(buttonColourHover);
-		if(MouseReleased)
-		{
-			outPut = 'o';	
-		}
 	}
 	else if(b3.getGlobalBounds().contains(mousex, mousey))
 	{
@@ -122,9 +170,13 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	else if(b4.getGlobalBounds().contains(mousex, mousey))
 	{
 		b4.setFillColor(buttonColourHover);
+	}
+	else if(backButton.getGlobalBounds().contains(mousex, mousey))
+	{
+		backButton.setFillColor(buttonColourHover);
 		if(MouseReleased)
 		{
-			outPut = 'q';
+			outPut = 'b';
 		}
 	}
 
@@ -133,12 +185,14 @@ char DrawMainMenu(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* 
 	window->draw(b2);
 	window->draw(b3);
 	window->draw(b4);
+	window->draw(backButton);
 	
 	//Slap the text down
 	window->draw(b1Text);
 	window->draw(b2Text);
 	window->draw(b3Text);
 	window->draw(b4Text);
+	window->draw(backText);
 
 	//Actually draw the screen
 	window->display();
