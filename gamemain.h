@@ -9,12 +9,16 @@
 #include <string>
 #include <sstream>
 #include <time.h>
-
+#include "weapon.h"
 
 using namespace std;
 //Handle interface running
 bool runningScreen = true;
 
+//Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
+//you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
+//to make sure that we don't get anything weird happen
+int gameclock = 1;
 
 //Handle Characters
 vector<char> charPressed ={};
@@ -33,10 +37,10 @@ bool LEFTpressed  = false;
 bool RIGHTpressed = false;
 
 class Player {
-	int xpos, ypos;
-	float xVel, yVel;
-	int speed = 5;
 	public:
+		int xpos, ypos, xVel, yVel, firerate;
+		int speed = 20;
+	
 		void setInitValues(int, int);
 		void drawPlayer(sf::RenderWindow*);
 		void MoveCharacter();
@@ -48,14 +52,15 @@ void Player::setInitValues(int x, int y)
 	ypos = y;
 	xVel = 0;
 	yVel = 0;
+	firerate = 30;
 }
 
 void Player::drawPlayer(sf::RenderWindow* window)
 {
 	//Draw Player
 	sf::Color PlayerColor {160, 160, 200};
-	sf::Color black {0, 0, 0};
-	sf::Color GunGrey {120, 120, 120};
+	sf::Color black       {0,     0,   0};
+	sf::Color GunGrey     {120, 120, 120};
 
 	sf::CircleShape circle;
 	circle.setRadius(40);
@@ -194,7 +199,7 @@ void Player::MoveCharacter()
 		yVel += 1;
 	}
 	//set max speed, currently set to be a static 5, but could be changed.
-	int topspeed = 5;
+	int topspeed = 3;
 
 	if(xVel > topspeed)
 	{
@@ -219,23 +224,82 @@ void Player::MoveCharacter()
 
 Player mainChar;
 
+bool checkGunOut()
+{
+	bool gunOut = false;
+	if(UPpressed || DOWNpressed || LEFTpressed || RIGHTpressed)
+	{
+		gunOut = true;
+	}
+	return gunOut;
+}
+
 void playGameThread()
 {
 	while (runningScreen)
 	{
+		bool Firing = checkGunOut();
+
 		mainChar.MoveCharacter();
+		//If gameclock ready spawn new shot
+		if(gameclock % mainChar.firerate == 0 && Firing)
+		{
+			//Fixme
+			int xVelo = 0;
+			int yVelo = 0;
+
+			if(RIGHTpressed)
+			{
+				xVelo += 5;
+			}
+			if(LEFTpressed)
+			{
+				xVelo -= 5;
+			}
+			if(UPpressed)
+			{
+				yVelo -= 5;
+			}
+			if(DOWNpressed)
+			{
+				yVelo += 5;
+			}
+			
+
+
+			projectile Bullet;
+			Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo, 5, 200);
+			//Bullet.addSpeed(5, 5);
+			AllProjectiles.push_back(Bullet);
+		}
+		int NumProjectiles = AllProjectiles.size();
+
+		for(int i = 0; i < NumProjectiles; i++)
+		{
+			bool survived = AllProjectiles[i].moveProjectile();
+			if(!survived)
+			{
+				//Kill bullet idk;
+			}
+		}
+
 		unsigned int microsecond = 1000000;
 		usleep(0.005*microsecond);
+		gameclock+=1;
 	}
 }
 
 void GameScreen(sf::RenderWindow* window)
 {
-	bool screenRunning = true;
+	//Init values
 	char next;
 	mainChar.setInitValues(900, 900);
+	//This thread handles the game stuff. Seperated them in order to have the game render quicker
+	//
+	
 	sf::Thread thread(&playGameThread);
 	thread.launch();
+	//This loop updates the screen and draws the picture.
 	while(runningScreen)
 	{
 
@@ -261,25 +325,17 @@ void GameScreen(sf::RenderWindow* window)
 		next = DrawGameScreen(MouseX, MouseY, MouseReleased, mainChar, window);
 		CharsPressed();	
 		int len = charPressed.size();
-		for (int i = 0; i < len; i++)
+		/*for (int i = 0; i < len; i++)
 		{
 			cout << charPressed[i];
 		}
-		/*
-		mainChar.MoveCharacter();
-		*/
 		cout << "\n";
-
+		*/
 		if(next != 's')
 		{
-			screenRunning = false;
+			runningScreen = false;
 		}
 
-		
-		/*
-		unsigned int microsecond = 1000000;
-		usleep(0.005*microsecond);
-		*/
 	}
 
 }
@@ -299,10 +355,18 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar,
 	background.setPosition(0, 0);
 	background.setFillColor(backgroundColour);
 	window->draw(background);
+	
+	//Draw Player Bullets
+	int numShots = AllProjectiles.size();
+	for(int i = 0; i < numShots; i++)
+	{
+		AllProjectiles[i].drawProjectile(window);
+	}
+
 
 	//Draw Player
 	mainChar.drawPlayer(window);
-
+	
 	//Display screen
 	window->display();
 	window->clear();
