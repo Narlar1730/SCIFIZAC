@@ -10,6 +10,15 @@ class Player {
 		void MoveCharacter();
 };
 
+int divRootTwoToo(int Value)
+{
+	int retVal;
+	double rootTwo = 1.414214;
+	double retValDub = static_cast<double>(Value)/rootTwo;
+	retVal = static_cast<int>(retValDub);
+
+	return retVal;
+}
 
 void Player::setInitValues(int x, int y)
 {
@@ -150,8 +159,15 @@ void Player::MoveCharacter()
 	{
 		yVel = -1*topspeed;
 	}
+	if(xVel*xVel == yVel*yVel)
+	{
+		xVel = divRootTwoToo(xVel);
+		yVel = divRootTwo(yVel);
+	}
+
 	xpos = xpos + xVel;
 	ypos = ypos + yVel;
+	
 
 }
 
