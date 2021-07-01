@@ -1,15 +1,33 @@
 class SlimeEnemy {
 	public:
-		int xpos, ypos, curRadius, init_size, r, g, b;
+		int xpos, ypos, curRadius, init_size, r, g, b, hitCounter;
+		int health = init_size*10;
 		int speed = 10;
 		bool growing;
 		void spawnSlime();
+		bool hurtSlime(int);
 		void spawnSlime(int, int);
 		void drawSlime(sf::RenderWindow*);
 		void moveSlime();
 };
 
 vector<SlimeEnemy> SlimeList;
+
+bool SlimeEnemy::hurtSlime(int damage)
+{
+	bool Alive = true;
+	//Maybe implement crits?
+	health -= damage;
+
+	if(health < 0)
+	{
+		Alive = false;
+	}
+
+	hitCounter = 20;
+
+	return Alive;
+}
 
 void SlimeEnemy::spawnSlime()
 {
@@ -50,6 +68,7 @@ void SlimeEnemy::spawnSlime(int x, int y)
 	curRadius = rand() % 30 + 20;
 	init_size = curRadius;
 
+	hitCounter = 0;
 }
 
 void SlimeEnemy::moveSlime()
@@ -57,22 +76,48 @@ void SlimeEnemy::moveSlime()
 	int xDir = mainChar.xpos;
 	int yDir = mainChar.ypos;
 	//Move slime
-	if(xDir > xpos)
+	
+	if(hitCounter == 0)
 	{
-		xpos += 1;
+		if(xDir > xpos)
+		{
+			xpos += 1;
+		}
+		else
+		{
+			xpos -= 1;
+		}
+		if(yDir > ypos)
+		{
+			ypos += 1;
+		}
+		else
+		{
+			ypos -= 1;
+		}
 	}
 	else
 	{
-		xpos -= 1;
+		if(xDir > xpos)
+		{
+			xpos -= 1;
+		}
+		else
+		{
+			xpos += 1;
+		}
+		if(yDir > ypos)
+		{
+			ypos -= 1;
+		}
+		else
+		{
+			ypos += 1;
+		}
+		hitCounter -= 1;
 	}
-	if(yDir > ypos)
-	{
-		ypos += 1;
-	}
-	else
-	{
-		ypos -= 1;
-	}
+
+
 	//Change size
 	if(gameclock % 15 == 0)
 	{
@@ -173,6 +218,7 @@ void SlimeEnemy::moveSlime()
 				break;
 		}
 	}
+
 	
 }
 

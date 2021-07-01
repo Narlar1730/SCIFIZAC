@@ -8,6 +8,7 @@
 #include <tuple>
 #include <string>
 #include <sstream>
+#include <math.h>
 #include <time.h>
 #include "weapon.h"
 #include "player.h"
@@ -24,38 +25,7 @@ Player mainChar;
 //Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
 //you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
 //to make sure that we don't get anything weird happen
-//Handle Characters
-vector<char> charPressed ={};
 
-void CharsPressed()
-{
-	vector<char> outArray = {};
-	if(Dpressed)
-	{
-		outArray.push_back('d');
-	}
-	if(Epressed)
-	{
-		outArray.push_back('e');
-	}
-	if(Spressed)
-	{
-		outArray.push_back('s');
-	}
-	if(Apressed)
-	{
-		outArray.push_back('a');
-	}
-	if(Wpressed)
-	{
-		outArray.push_back('w');
-	}
-	if(Lpressed)
-	{
-		outArray.push_back('l');
-	}
-	charPressed = outArray;
-}
 char DrawGameScreen(int, int, bool, Player, sf::RenderWindow*);
 
 bool checkGunOut()
@@ -66,6 +36,22 @@ bool checkGunOut()
 		gunOut = true;
 	}
 	return gunOut;
+}
+
+bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
+{
+	bool intercept = false;
+
+	float Distance = sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+
+	float totalRadius = static_cast<float>(r1) + static_cast<float>(r2);
+
+	if(Distance < totalRadius)
+	{
+		intercept = true;
+	}
+
+	return intercept;
 }
 
 void playGameThread()
@@ -102,16 +88,54 @@ void playGameThread()
 
 
 			projectile Bullet;
-			Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo, 5, 150);
+			Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo, 8, 150);
 			//Bullet.addSpeed(5, 5);
 			AllProjectiles.push_back(Bullet);
 		}
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
+		vector<SlimeEnemy> slimeVec{};
+		if(gameclock%300 == 0)
+		{
+			SlimeEnemy FirstSlime;
+			FirstSlime.spawnSlime();
+			SlimeList.push_back(FirstSlime);
+		}
+
+		int numSlimes = SlimeList.size();
+		
+		for(int i = 0; i < numSlimes; i++)
+		{
+			SlimeList[i].moveSlime();
+			SlimeEnemy CurSlime = SlimeList[i];
+			int slimeR = CurSlime.curRadius;
+			int slimeX = CurSlime.xpos;
+			int slimeY = CurSlime.ypos;
+			for(int j = 0; j < NumProjectiles; j++)
+			{
+				//FIXME -- this is where I got up to, slime collision with bullets.
+				int Pradi = AllProjectiles[j].radius;
+				int Pxpos = AllProjectiles[j].xpos + Pradi;
+				int Pypos = AllProjectiles[j].ypos + Pradi;
+
+				if(circleIntercept(slimeX, slimeY, slimeR, Pxpos, Pypos, Pradi) || Epressed)
+				{
+					SlimeList[i].hurtSlime(100);
+					AllProjectiles[j].Alive = false;
+				}
+			}
+			if(SlimeList[i].health > 0)
+			{
+				slimeVec.push_back(SlimeList[i]);
+			}
+		}
+
+		SlimeList = slimeVec;
+
 		for(int i = 0; i < NumProjectiles; i++)
 		{
 			bool survived = AllProjectiles[i].moveProjectile();
-			if(survived)
+			if(survived && AllProjectiles[i].Alive)
 			{
 				newVec.push_back(AllProjectiles[i]);
 			}
@@ -123,19 +147,7 @@ void playGameThread()
 			FirstSlime.spawnSlime();
 			SlimeList.push_back(FirstSlime);
 		}
-
-		int numSlimes = SlimeList.size();
-		for(int i = 0; i < numSlimes; i++)
-		{
-			slime CurSlime = SlimeList[i].moveSlime();
-			int slimeX = CurSlime.xpos;
-			int slimeY = CurSlime.ypos;
-			for(int i = 0; i < NumProjectiles; i++)
-			{
-				//FIXME -- this is where I got up to, slime collision with bullets.
-				//Will do tomorrow
-			}
-		}
+		
 
 		AllProjectiles = newVec;
 
@@ -186,7 +198,6 @@ void GameScreen(sf::RenderWindow* window)
 		}
 
 		next = DrawGameScreen(MouseX, MouseY, MouseReleased, mainChar, window);
-		CharsPressed();	
 		if(next != 's')
 		{
 			runningScreen = false;

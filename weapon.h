@@ -11,12 +11,13 @@ class weapon {
 };
 
 class projectile {
-	int xSpeed, ySpeed, xpos, ypos, radius, life;
-	public:
+	public: 
+		int xSpeed, ySpeed, xpos, ypos, radius, life;
 		void spawnProjectile(int, int, int, int, int, int);
 		void drawProjectile(sf::RenderWindow*);
 		void addSpeed(int, int);
 		bool moveProjectile();
+		bool Alive;
 		friend bool operator== (projectile lhs, projectile rhs);
 		friend bool operator!= (projectile lhs, projectile rhs);
 };
@@ -99,6 +100,7 @@ int divRootTwo(int Value)
 
 void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int radii, int lifespan)
 {
+	Alive = true;
 	if(xVel > 0 && xVel < 5)
 	{
 		xVel = 5;
@@ -146,6 +148,7 @@ bool projectile::moveProjectile()
 	if(life == 0)
 	{
 		survived = false;
+		Alive = false;
 	}
 	return survived;
 }
