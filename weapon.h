@@ -84,6 +84,19 @@ void projectile::addSpeed(int xVel, int yVel)
 	}
 }
 
+int divRootTwo(int Value)
+{
+	int retVal;
+	double rootTwo   = 1.414214;
+	double retValDub = static_cast<double>(Value)/rootTwo;
+
+	retVal = static_cast<int>(retValDub);
+
+	return retVal;
+
+
+}
+
 void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int radii, int lifespan)
 {
 	if(xVel > 0 && xVel < 5)
@@ -107,6 +120,12 @@ void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int rad
 	//V = sqrt(x*x +y*y)
 	//This means bullets go faster on the diagonal
 	//i can probably fix this? But thats why its fixme tagged.
+	if(xVel*xVel == yVel*yVel)
+	{
+		xVel = divRootTwo(xVel);
+		yVel = divRootTwo(yVel);
+	}
+
 
 	xpos = xPos+20;
 	ypos = yPos+20;
