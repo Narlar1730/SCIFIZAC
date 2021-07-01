@@ -12,8 +12,9 @@
 //#include "board.h"
 //#include "titlescreen.h"
 //#include "optionsscreen.h"
-#include "gamemain.h"
-#include "keyBoardManagement.h"
+//#include "gamemain.h"
+//#include "keyBoardManagement.h"
+#include "weapon.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ Bright White    97  107
 
 void testingProjectilesClass()
 {
-	printf("\x1b[34mRunning Automated testing of class: projectile \033[0m\n");
+	printf("\x1b[95mRunning Automated testing of class: projectile \033[0m\n");
 
 	//new1 and new2 are the same, new2 will be differnet. 
 	projectile new1;
@@ -52,7 +53,7 @@ void testingProjectilesClass()
 	new2.spawnProjectile(2, 2, 3, 3, 4, 50);
 	new3.spawnProjectile(1, 1, 1, 1, 1, 10);
 
-	printf("\x1b[34mRunning test of boolean operators, == and !=\033[0m\n");
+	printf("\x1b[95mRunning test of boolean operators, == and !=\033[0m\n");
 	
 	printf("\x1b[33mTesting equality one way\033[0m\n");
 	if(new1 == new2)
@@ -109,7 +110,7 @@ void testingProjectilesClass()
 	}
 	
 	printf("\n");
-	printf("\x1b[33mTesting Module for projectiles completed.\033[0m\n");
+	printf("\x1b[95mTesting Module for projectiles completed.\033[0m\n");
 
 	
 }

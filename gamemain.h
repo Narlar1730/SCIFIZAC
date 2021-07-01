@@ -11,16 +11,19 @@
 #include <time.h>
 #include "weapon.h"
 #include "player.h"
-
+//#include "slimeEnemy.h"
 using namespace std;
 //Handle interface running
 bool runningScreen = true;
 
+int gameclock = 1;
+Player mainChar;
+
+#include "slimeEnemy.h"
+
 //Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
 //you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
 //to make sure that we don't get anything weird happen
-int gameclock = 1;
-
 //Handle Characters
 vector<char> charPressed ={};
 
@@ -54,8 +57,6 @@ void CharsPressed()
 	charPressed = outArray;
 }
 char DrawGameScreen(int, int, bool, Player, sf::RenderWindow*);
-
-Player mainChar;
 
 bool checkGunOut()
 {
@@ -113,6 +114,26 @@ void playGameThread()
 			if(survived)
 			{
 				newVec.push_back(AllProjectiles[i]);
+			}
+		}
+		
+		if(gameclock%300 == 0)
+		{
+			SlimeEnemy FirstSlime;
+			FirstSlime.spawnSlime();
+			SlimeList.push_back(FirstSlime);
+		}
+
+		int numSlimes = SlimeList.size();
+		for(int i = 0; i < numSlimes; i++)
+		{
+			slime CurSlime = SlimeList[i].moveSlime();
+			int slimeX = CurSlime.xpos;
+			int slimeY = CurSlime.ypos;
+			for(int i = 0; i < NumProjectiles; i++)
+			{
+				//FIXME -- this is where I got up to, slime collision with bullets.
+				//Will do tomorrow
 			}
 		}
 
@@ -208,6 +229,13 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar,
 		AllProjectiles[i].drawProjectile(window);
 	}
 
+
+	//Draw Slimes
+	int numSlimes = SlimeList.size();
+	for(int i = 0; i < numSlimes; i++)
+	{
+		SlimeList[i].drawSlime(window);
+	}
 
 	//Draw Player
 	mainChar.drawPlayer(window);
