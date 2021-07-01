@@ -17,7 +17,50 @@ class projectile {
 		void drawProjectile(sf::RenderWindow*);
 		void addSpeed(int, int);
 		bool moveProjectile();
+		friend bool operator== (projectile lhs, projectile rhs);
+		friend bool operator!= (projectile lhs, projectile rhs);
 };
+
+bool operator!= (projectile lhs, projectile rhs)
+{
+	bool output = true;
+	if(lhs == rhs)
+	{
+		output = false;
+	}
+	return output;
+}
+
+bool operator== (projectile lhs, projectile rhs)
+{
+	bool output = true;
+	//cout << "Checking projectile equality\n";
+	if(lhs.xSpeed != rhs.xSpeed)
+	{
+		output = false;
+	}
+	if(lhs.ySpeed != rhs.xSpeed)
+	{
+		output = false;
+	}
+	if(lhs.xpos != rhs.xpos)
+	{
+		output = false;
+	}
+	if(lhs.ypos != rhs.ypos)
+	{
+		output = false;
+	}
+	if(lhs.radius != rhs.radius)
+	{
+		output = false;
+	}
+	if(lhs.life != rhs.life)
+	{
+		output = false;
+	}
+	return output;
+}
 
 vector<projectile> AllProjectiles;
 
@@ -33,18 +76,16 @@ void projectile::addSpeed(int xVel, int yVel)
 	}
 	if(ySpeed < 0)
 	{
-		ySpeed -= ySpeed;
+		ySpeed -= yVel;
 	}
 	else
 	{
-		ySpeed += ySpeed;
+		ySpeed += yVel;
 	}
 }
 
 void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int radii, int lifespan)
 {
-	double totalVelocity = 0;
-	int biggerVal;
 	if(xVel > 0 && xVel < 5)
 	{
 		xVel = 5;

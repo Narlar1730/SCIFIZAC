@@ -28,7 +28,13 @@ void statsScreen(sf::RenderWindow* window)
 		int MouseY = pixelPos.y;
 		bool MouseDown = false;
 		bool MouseReleased = false;
-
+		
+		//FIXME
+		//This is only here to stop a warning, it doesn't do anything
+		if(MouseDown)
+		{
+		
+		}
 		while(window->pollEvent(event))
 		{
 			if(event.type == sf::Event::MouseButtonReleased)

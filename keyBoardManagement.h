@@ -11,6 +11,19 @@
 
 using namespace std;
 
+bool Dpressed = false;
+bool Epressed = false;
+bool Spressed = false;
+bool Apressed = false;
+bool Wpressed = false;
+bool Lpressed = false;
+
+bool UPpressed    = false;
+bool DOWNpressed  = false;
+bool LEFTpressed  = false;
+bool RIGHTpressed = false;
+
+
 void performKeyPress()
 {
 	// Reset Current Keys pressed

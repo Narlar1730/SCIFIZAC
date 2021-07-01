@@ -10,10 +10,10 @@
 #include <sstream>
 #include <time.h>
 //#include "board.h"
+#include "keyBoardManagement.h"
 #include "titlescreen.h"
 #include "optionsscreen.h"
 #include "gamemain.h"
-#include "keyBoardManagement.h"
 
 using namespace std;
 
@@ -38,6 +38,12 @@ void openingScreen(sf::RenderWindow* window)
 		int MouseY = pixelPos.y;
 		bool MouseDown = false;
 		bool MouseReleased = false;
+		
+		//FIXME warning removal
+		if(MouseDown)
+		{
+		
+		}
 		while(window->pollEvent(event))
 		{
 			if(event.type == sf::Event::MouseButtonReleased)
