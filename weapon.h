@@ -2,12 +2,23 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <math.h>
+#include <string>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
+// Different weapons fire different style shots. ie. Shotgun, many short.
+// Rifle, 1 long as it stands, this is what we have
+// Shotgun - S
+// Rifle - R
 class weapon {
-	int damage, firerate, range;
-
+	public:
+		int damage, firerate, range, bulletSize, bulletSpeed, extra;
+		char style;
+		void FireWeapon();
+		void drawWeapon(sf::RenderWindow*);
+		void setGun(int, int, int, char, int, int);
 };
 
 class projectile {
@@ -21,6 +32,114 @@ class projectile {
 		friend bool operator== (projectile lhs, projectile rhs);
 		friend bool operator!= (projectile lhs, projectile rhs);
 };
+
+
+//Set Projectile List
+vector<projectile> AllProjectiles;
+
+// Set init Weapon
+weapon FirstGun;
+//FirstGun.setGun(100, 30, 150, 'R', 8, 'N');
+
+/*
+FirstGun.damage = 100;
+FirstGun.firerate = 30;
+FirstGun.range = 150;
+FirstGun.style = 'R';
+FirstGun.bulletSize = 8;
+*/
+void weapon::setGun(int D, int FR, int R, char S, int BS, int N)
+{
+	damage = D;
+	firerate = FR;
+	range = R;
+	style = S;
+	bulletSize = BS;
+	extra = N;
+}
+
+
+void weapon::FireWeapon()
+{
+	if(gameclock % firerate == 0)
+	{
+		switch(style)
+		{
+			case 'R':
+				if(true)
+				{
+					//Fixme
+					int xVelo = 0;
+					int yVelo = 0;
+
+					if(RIGHTpressed)
+					{
+						xVelo += 5;
+					}
+					if(LEFTpressed)
+					{
+						xVelo -= 5;
+					}
+					if(UPpressed)
+					{
+						yVelo -= 5;
+					}
+					if(DOWNpressed)
+					{
+						yVelo += 5;
+					}
+					
+
+
+					projectile Bullet;
+					Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo, bulletSize, range);
+					//Bullet.addSpeed(5, 5);
+					AllProjectiles.push_back(Bullet);
+				}
+
+				break;
+			case 'S':
+				//double angleSep = 45/extra;
+				int xVelo = 0;
+				int yVelo = 0;
+				bool yShift = false;
+				if(RIGHTpressed)
+				{
+					xVelo += 5;
+					yShift = true;
+				}
+				if(LEFTpressed)
+				{
+					xVelo -= 5;
+					yShift = true;
+				}
+				if(UPpressed)
+				{
+					yVelo -= 5;
+				}
+				if(DOWNpressed)
+				{
+					yVelo += 5;
+				}
+				for(int i = 0; i < extra; i++)
+				{
+					int offset = rand() % extra - (extra/2);
+					projectile Bullet;
+					if(yShift)
+					{
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo+offset, bulletSize, range);
+					}
+					else
+					{
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo+offset, mainChar.yVel+yVelo, bulletSize, range);
+					}
+
+					AllProjectiles.push_back(Bullet);
+				}
+				break;
+		}
+	}
+}
 
 bool operator!= (projectile lhs, projectile rhs)
 {
@@ -62,8 +181,6 @@ bool operator== (projectile lhs, projectile rhs)
 	}
 	return output;
 }
-
-vector<projectile> AllProjectiles;
 
 void projectile::addSpeed(int xVel, int yVel)
 {

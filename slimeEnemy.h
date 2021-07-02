@@ -1,3 +1,8 @@
+/*
+ *This header file contains all the stuff for the slime enemy. 
+ * 
+ * We have the class, slime Enemy, and the vector, SlimeList which contains all the slimes
+ */
 class SlimeEnemy {
 	public:
 		int xpos, ypos, curRadius, init_size, r, g, b, hitCounter;
@@ -24,7 +29,7 @@ bool SlimeEnemy::hurtSlime(int damage)
 		Alive = false;
 	}
 
-	hitCounter = 20;
+	hitCounter = 50;
 
 	return Alive;
 }
@@ -76,27 +81,57 @@ void SlimeEnemy::moveSlime()
 	int xDir = mainChar.xpos;
 	int yDir = mainChar.ypos;
 	//Move slime
+	//Angle betwen slime and player = theta	
+	double theta = 0;
 	
-	if(hitCounter == 0)
-	{
-		if(xDir > xpos)
+	theta = atan((static_cast<double>(ypos) - static_cast<double>(yDir))/(static_cast<double>(xpos) - static_cast<double>(xDir)));
+
+	if(hitCounter == 0 && gameclock % 4 == 0)
+	{	
+		int yVelo = abs(static_cast<int>(3*sin(theta)));
+		int xVelo = abs(static_cast<int>(3*cos(theta)));
+		if(xDir > xpos) 
 		{
-			xpos += 1;
+			xpos += xVelo;
 		}
-		else
+		else if(xDir < xpos)
 		{
-			xpos -= 1;
+			xpos -= xVelo;
 		}
 		if(yDir > ypos)
 		{
-			ypos += 1;
+			ypos += yVelo;
 		}
-		else
+		else if(yDir < ypos)
 		{
-			ypos -= 1;
+			ypos -= yVelo;
 		}
 	}
-	else
+	else if(gameclock % 4 == 0)
+	{
+		int yVelo = abs(static_cast<int>(3*sin(theta)));
+		int xVelo = abs(static_cast<int>(3*cos(theta)));
+		if(xDir > xpos) 
+		{
+			xpos -= 2*xVelo;
+		}
+		else if(xDir < xpos)
+		{
+			xpos += 2*xVelo;
+		}
+		if(yDir > ypos)
+		{
+			ypos -= 2*yVelo;
+		}
+		else if(yDir < 2*ypos)
+		{
+			ypos += 2*yVelo;
+		}
+		hitCounter -= 2;
+
+	}
+
+	/*else
 	{
 		if(xDir > xpos)
 		{
@@ -115,7 +150,7 @@ void SlimeEnemy::moveSlime()
 			ypos += 1;
 		}
 		hitCounter -= 1;
-	}
+	}*/
 
 
 	//Change size
@@ -218,7 +253,7 @@ void SlimeEnemy::moveSlime()
 				break;
 		}
 	}
-
+	
 	
 }
 
@@ -226,7 +261,23 @@ void SlimeEnemy::drawSlime(sf::RenderWindow* window)
 {
 	sf::CircleShape slime;
 	slime.setRadius(curRadius);
-	slime.setFillColor(sf::Color(r, g, b));
+	int rHurt = r+hitCounter;
+	int gHurt = g-hitCounter;
+	int bHurt = b-hitCounter;
+	if(gHurt < 0)
+	{
+		gHurt = 0;
+	}
+	if(bHurt < 0)
+	{
+		bHurt = 0;
+	}
+
+	if(rHurt > 255)
+	{
+		rHurt = 255;	
+	}
+	slime.setFillColor(sf::Color(rHurt, gHurt, bHurt));
 	
 	int rO = r + 20;
 	int gO = g + 20;

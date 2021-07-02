@@ -162,7 +162,7 @@ void Player::MoveCharacter()
 	if(xVel*xVel == yVel*yVel)
 	{
 		xVel = divRootTwoToo(xVel);
-		yVel = divRootTwo(yVel);
+		yVel = divRootTwoToo(yVel);
 	}
 
 	xpos = xpos + xVel;

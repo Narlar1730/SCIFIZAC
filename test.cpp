@@ -15,6 +15,9 @@
 //#include "gamemain.h"
 //#include "keyBoardManagement.h"
 #include "weapon.h"
+//#include "player.h"
+//Player MainChar;
+//include "slimeEnemy.h"
 
 using namespace std;
 
@@ -39,6 +42,41 @@ Bright Cyan     96  106
 Bright White    97  107
 
 */
+void testingSlimeClass()
+{
+	printf("\x1b[95mRunning Automated testing of class: SlimeEnemy \033[0m\n");
+
+	//new1 and new2 are the same, new2 will be differnet. 
+	/*SlimeEnemy new1;
+	SlimeEnemy new2;
+	SlimeEnemy new3;
+	
+	MainChar.xpos = 50;
+	MainChar.ypos = 50;
+
+	new1.spawnSlime(1, 1);
+	new2.spawnProjectile(10, 10);
+	new3.spawnProjectile(100, 100);
+	i*/
+	printf("\x1b[95mRunning test of MoveSlime\033[0m\n");
+	
+	printf("\x1b[33mTesting equality one way\033[0m\n");
+	/*if(new1 == new2)
+	{
+		printf("\x1b[32mTest Passed, equality works one way n1 == n2. \033[0m\n");
+	}
+	else
+	{
+		printf("\x1b[31mTest Failed. Equality is not working n1 == n2 \033[0m\n");
+	
+	}*/
+	printf("\n");
+		
+	printf("\x1b[95mTesting Module for projectiles completed.\033[0m\n");
+
+
+}
+
 
 void testingProjectilesClass()
 {
@@ -118,6 +156,9 @@ void testingProjectilesClass()
 int main()
 {
 	testingProjectilesClass();
-	
+	printf("\n");
+	printf("\x1b[31m----------------------------------------------------------------------------\033[0m");
+	printf("\n\n");
+	testingSlimeClass();
 	return 0;
 }

@@ -10,7 +10,6 @@
 #include <sstream>
 #include <math.h>
 #include <time.h>
-#include "weapon.h"
 #include "player.h"
 //#include "slimeEnemy.h"
 using namespace std;
@@ -20,6 +19,7 @@ bool runningScreen = true;
 int gameclock = 1;
 Player mainChar;
 
+#include "weapon.h"
 #include "slimeEnemy.h"
 
 //Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
@@ -27,6 +27,8 @@ Player mainChar;
 //to make sure that we don't get anything weird happen
 
 char DrawGameScreen(int, int, bool, Player, sf::RenderWindow*);
+
+
 
 bool checkGunOut()
 {
@@ -56,52 +58,34 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 
 void playGameThread()
 {
+	FirstGun.setGun(100, 30, 150, 'R', 8, 0);
 	while (runningScreen)
 	{
 		bool Firing = checkGunOut();
 
 		mainChar.MoveCharacter();
 		//If gameclock ready spawn new shot
-		if(gameclock % mainChar.firerate == 0 && Firing)
+		if(Firing)
 		{
-			//Fixme
-			int xVelo = 0;
-			int yVelo = 0;
-
-			if(RIGHTpressed)
-			{
-				xVelo += 5;
-			}
-			if(LEFTpressed)
-			{
-				xVelo -= 5;
-			}
-			if(UPpressed)
-			{
-				yVelo -= 5;
-			}
-			if(DOWNpressed)
-			{
-				yVelo += 5;
-			}
-			
-
-
-			projectile Bullet;
-			Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo, 8, 150);
-			//Bullet.addSpeed(5, 5);
-			AllProjectiles.push_back(Bullet);
+			FirstGun.FireWeapon();
+		}
+		if(Lpressed)
+		{
+			FirstGun.setGun(100, 30, 75, 'S', 8, 15);
 		}
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
 		vector<SlimeEnemy> slimeVec{};
+		
+		//Spawn New SLimes
 		if(gameclock%300 == 0)
 		{
 			SlimeEnemy FirstSlime;
 			FirstSlime.spawnSlime();
 			SlimeList.push_back(FirstSlime);
 		}
-
+		
+		// Update slime position
 		int numSlimes = SlimeList.size();
 		
 		for(int i = 0; i < numSlimes; i++)
@@ -113,7 +97,7 @@ void playGameThread()
 			int slimeY = CurSlime.ypos;
 			for(int j = 0; j < NumProjectiles; j++)
 			{
-				//FIXME -- this is where I got up to, slime collision with bullets.
+				//FIXME
 				int Pradi = AllProjectiles[j].radius;
 				int Pxpos = AllProjectiles[j].xpos + Pradi;
 				int Pypos = AllProjectiles[j].ypos + Pradi;
@@ -131,7 +115,7 @@ void playGameThread()
 		}
 
 		SlimeList = slimeVec;
-
+		// Update bullet position
 		for(int i = 0; i < NumProjectiles; i++)
 		{
 			bool survived = AllProjectiles[i].moveProjectile();
@@ -141,14 +125,6 @@ void playGameThread()
 			}
 		}
 		
-		if(gameclock%300 == 0)
-		{
-			SlimeEnemy FirstSlime;
-			FirstSlime.spawnSlime();
-			SlimeList.push_back(FirstSlime);
-		}
-		
-
 		AllProjectiles = newVec;
 
 		unsigned int microsecond = 1000000;

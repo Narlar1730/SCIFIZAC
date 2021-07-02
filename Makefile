@@ -4,6 +4,9 @@ CXXFLAGS += -std=c++11
 # HIGHLY RECOMMENDED flags
 CXXFLAGS += -Wall -Wextra -pedantic-errors -lsfml-graphics -lsfml-window -lsfml-system
 
+# Include the headers
+HEADERS := $(wildcard *.h)
+
 # required for SFML programs
 LDLIBS := $(shell pkg-config sfml-all --libs)
 LDLIBS += -lX11
