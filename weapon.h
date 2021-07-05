@@ -94,7 +94,7 @@ void weapon::FireWeapon()
 
 
 					projectile Bullet;
-					Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo, bulletSize, range);
+					Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo, bulletSize, range);
 					//Bullet.addSpeed(5, 5);
 					AllProjectiles.push_back(Bullet);
 				}

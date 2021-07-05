@@ -21,7 +21,7 @@ Player mainChar;
 
 #include "weapon.h"
 #include "slimeEnemy.h"
-
+#include "Gameoverscreen.h"
 //Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
 //you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
 //to make sure that we don't get anything weird happen
@@ -63,7 +63,7 @@ void playGameThread()
 	{
 		bool Firing = checkGunOut();
 
-		mainChar.MoveCharacter();
+		runningScreen = mainChar.MoveCharacter();
 		//If gameclock ready spawn new shot
 		if(Firing)
 		{
@@ -72,6 +72,10 @@ void playGameThread()
 		if(Lpressed)
 		{
 			FirstGun.setGun(100, 30, 75, 'S', 8, 5);
+		}
+		if(Epressed)
+		{
+			mainChar.hurtPlayer(1);
 		}
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
@@ -108,6 +112,10 @@ void playGameThread()
 					AllProjectiles[j].Alive = false;
 				}
 			}
+			if(circleIntercept(slimeX, slimeY, slimeR, mainChar.xpos, mainChar.ypos, 40))
+			{
+				mainChar.hurtPlayer(1);
+			}
 			if(SlimeList[i].health > 0)
 			{
 				slimeVec.push_back(SlimeList[i]);
@@ -143,6 +151,8 @@ void playGameThread()
 		usleep(0.005*microsecond);
 		gameclock+=1;
 	}
+
+
 }
 
 void GameScreen(sf::RenderWindow* window)
@@ -158,7 +168,6 @@ void GameScreen(sf::RenderWindow* window)
 	//This loop updates the screen and draws the picture.
 	while(runningScreen)
 	{
-
 		sf::Event event;
 		sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
 		int MouseX = pixelPos.x;
@@ -192,6 +201,7 @@ void GameScreen(sf::RenderWindow* window)
 		}
 
 	}
+	mainChar.curHealth = mainChar.maxHealth;
 
 }
 

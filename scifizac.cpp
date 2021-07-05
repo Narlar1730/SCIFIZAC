@@ -74,6 +74,8 @@ void openingScreen(sf::RenderWindow* window)
 			break;
 		case 'p' :
 			GameScreen(window);
+			runningScreen = true;
+			gameOverScreen(window);
 			break;
 		case 'q' :
 			cout << "User quit From main menu\n";

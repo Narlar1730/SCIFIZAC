@@ -2,13 +2,23 @@
 
 class Player {
 	public:
-		int xpos, ypos, xVel, yVel, firerate;
+		int xpos, ypos, xVel, yVel, firerate, maxHealth, curHealth, painBuffer;
 		int speed = 20;
-
+		void hurtPlayer(int);
 		void setInitValues(int, int);
 		void drawPlayer(sf::RenderWindow*);
-		void MoveCharacter();
+		bool MoveCharacter();
 };
+
+void Player::hurtPlayer(int hurt)
+{
+	if(painBuffer <= 0)
+	{
+		curHealth = curHealth - hurt;
+		painBuffer += 60;
+	}
+
+}
 
 int divRootTwoToo(int Value)
 {
@@ -27,15 +37,25 @@ void Player::setInitValues(int x, int y)
 	xVel = 0;
 	yVel = 0;
 	firerate = 30;
+	maxHealth = 10;
+	curHealth = 10;
+	painBuffer = 0;
 }
 
 void Player::drawPlayer(sf::RenderWindow* window)
 {
 	//Draw Player
-	sf::Color PlayerColor {160, 160, 200};
+	//
+	int r = 160+painBuffer*2;
+	if(r > 255)
+	{
+		r = 255;
+	}
+	sf::Uint8 rColor = r;
+	sf::Color PlayerColor {rColor, 160, 200};
 	sf::Color black       {0,     0,   0};
 	sf::Color GunGrey     {120, 120, 120};
-
+	sf::Color red	      {255,   0,   0};
 	sf::CircleShape circle;
 	circle.setRadius(40);
 	circle.setFillColor(PlayerColor);
@@ -96,14 +116,31 @@ void Player::drawPlayer(sf::RenderWindow* window)
 		window->draw(gun);
 	}
 
+	//Draw healthbar.
+	sf::RectangleShape backBar(sf::Vector2f(1600.f, 20.f));
+	backBar.setPosition(100, 1700);
+	backBar.setFillColor(GunGrey);
+	backBar.setOutlineColor(black);
+	backBar.setOutlineThickness(4);
+	//Calculate length
+	float healthLength = (static_cast<float>(curHealth) / static_cast<float>(maxHealth)) * 1592.f;	
+	//cout << healthLength << "\n";
+	sf::RectangleShape healthBar(sf::Vector2f(healthLength, 12.f));
+	healthBar.setPosition(104, 1704);
+	healthBar.setFillColor(red);
+
 
 	//Draw objects in the right order
+	window->draw(backBar);
+	window->draw(healthBar);
 	window->draw(circle);
 
 }
 
-void Player::MoveCharacter()
+bool Player::MoveCharacter()
 {
+	bool gameRun = true;
+
 	//Change Speed based on arrow key pressed
 	if(Apressed)
 	{
@@ -168,6 +205,21 @@ void Player::MoveCharacter()
 	xpos = xpos + xVel;
 	ypos = ypos + yVel;
 	
+	//Reduce pain buffer
+	if(painBuffer <= 0)
+	{
+		painBuffer = 0;
+	}
+	else
+	{
+		painBuffer -= 1;
+	}
+
+	if(curHealth <= 0)
+	{
+		gameRun = false;
+	}
+	return gameRun;
 
 }
 
