@@ -14,10 +14,11 @@ using namespace std;
 // Rifle - R
 class weapon {
 	public:
-		int damage, firerate, range, bulletSize, bulletSpeed, extra;
-		char style;
+		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
+		char style, rarity;
 		void FireWeapon();
-		void drawWeapon(sf::RenderWindow*);
+		void drawHeldWeapon(sf::RenderWindow*);
+		void drawGroundWeapon(sf::RenderWindow*);
 		void setGun(int, int, int, char, int, int);
 };
 
@@ -37,17 +38,44 @@ class projectile {
 //Set Projectile List
 vector<projectile> AllProjectiles;
 
+//Ground Weapon List
+vector<weapon> GroundWeapons;
+
 // Set init Weapon
 weapon FirstGun;
-//FirstGun.setGun(100, 30, 150, 'R', 8, 'N');
 
-/*
-FirstGun.damage = 100;
-FirstGun.firerate = 30;
-FirstGun.range = 150;
-FirstGun.style = 'R';
-FirstGun.bulletSize = 8;
-*/
+void weapon::drawGroundWeapon(sf::RenderWindow* window)
+{
+	sf::Color GunGrey  {100, 100, 100};
+	sf::Color bandGrey { 80,  80,  80};
+	sf::Color black    {  0,   0,   0};
+	switch(style)
+	{
+		case 'M':
+			{
+				for(int i = 0; i <3; i++)
+				{
+					sf::RectangleShape barrel(sf::Vector2f(60.f, 6.f));
+					barrel.setPosition(xpos, ypos+10*i);
+					barrel.setFillColor(GunGrey);
+					barrel.setOutlineColor(black);
+					barrel.setOutlineThickness(1);
+					window->draw(barrel);
+				}
+				for(int i = 0; i < 2; i++)
+				{
+					sf::RectangleShape band(sf::Vector2f(4.f, 30.f));
+					band.setPosition(xpos+10+i*35, ypos-2);
+					band.setFillColor(bandGrey);
+					band.setOutlineColor(black);
+					band.setOutlineThickness(1);
+					window->draw(band);
+				}
+				break;
+			}
+	}
+}
+
 void weapon::setGun(int D, int FR, int R, char S, int BS, int N)
 {
 	damage = D;
@@ -68,39 +96,58 @@ void weapon::FireWeapon()
 		switch(style)
 		{
 			case 'R':
-				if(true)
 				{
-					//Fixme
-					int xVelo = 0;
-					int yVelo = 0;
-
-					if(RIGHTpressed)
-					{
-						xVelo += 5;
-					}
-					if(LEFTpressed)
-					{
-						xVelo -= 5;
-					}
-					if(UPpressed)
-					{
-						yVelo -= 5;
-					}
-					if(DOWNpressed)
-					{
-						yVelo += 5;
-					}
-					
-
-
-					projectile Bullet;
-					Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo, bulletSize, range);
-					//Bullet.addSpeed(5, 5);
-					AllProjectiles.push_back(Bullet);
+				//Fixme
+				int xVelo = 0;
+				int yVelo = 0;
+				if(RIGHTpressed)
+				{
+					xVelo += 5;
 				}
-
+				if(LEFTpressed)
+				{
+					xVelo -= 5;
+				}
+				if(UPpressed)
+				{
+					yVelo -= 5;
+				}
+				if(DOWNpressed)
+				{
+					yVelo += 5;
+				}
+				projectile Bullet;
+				Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo, bulletSize, range);
+				AllProjectiles.push_back(Bullet);	
 				break;
+				}
+			case 'M':
+				{
+				int xVelo = 0;
+				int yVelo = 0;
+				if(RIGHTpressed)
+				{
+					xVelo += 5;
+				}
+				else if(LEFTpressed)
+				{
+					xVelo -= 5;
+				}
+				else if(UPpressed)
+				{
+					yVelo -= 5;
+				}
+				else if(DOWNpressed)
+				{
+					yVelo += 5;
+				}
+				projectile Bullet;
+				Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo, bulletSize, range);
+				AllProjectiles.push_back(Bullet);
+				break;
+				}
 			case 'S':
+				{
 				//double angleSep = 45/extra;
 				int xVelo = 0;
 				int yVelo = 0;
@@ -154,6 +201,7 @@ void weapon::FireWeapon()
 					AllProjectiles.push_back(Bullet);
 				}
 				break;
+				}
 		}
 	}
 }

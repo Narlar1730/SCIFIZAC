@@ -58,7 +58,7 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 
 void playGameThread()
 {
-	FirstGun.setGun(100, 30, 150, 'R', 8, 0);
+	FirstGun.setGun(100, 30, 150, 'R', 12, 0);
 	while (runningScreen)
 	{
 		bool Firing = checkGunOut();
@@ -71,11 +71,20 @@ void playGameThread()
 		}
 		if(Lpressed)
 		{
-			FirstGun.setGun(100, 30, 75, 'S', 8, 5);
+			//Set Shotgun
+			//FirstGun.setGun(100, 30, 75, 'S', 8, 5);
+			//Set minigun
+			FirstGun.setGun(30, 5, 75, 'M', 5, 0);
 		}
-		if(Epressed)
+		if(Epressed && GroundWeapons.size() == 0)
 		{
-			mainChar.hurtPlayer(1);
+			//Spawn Ground GUn
+			
+			weapon groundGun;
+			groundGun.setGun(30, 5, 75, 'M', 5, 0);
+			groundGun.xpos = 100;
+			groundGun.ypos = 100;
+			GroundWeapons.push_back(groundGun);
 		}
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
@@ -231,6 +240,13 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar,
 	background.setFillColor(backgroundColour);
 	window->draw(background);
 	
+	//Draw ground weapons
+	int numWeapons = GroundWeapons.size();
+	for(int i = 0; i < numWeapons; i++)
+	{
+		GroundWeapons[i].drawGroundWeapon(window);
+	}
+
 	//Draw Player Bullets
 	int numShots = AllProjectiles.size();
 	for(int i = 0; i < numShots; i++)
