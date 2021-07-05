@@ -23,7 +23,7 @@ class weapon {
 
 class projectile {
 	public: 
-		int xSpeed, ySpeed, xpos, ypos, radius, life;
+		int xSpeed, ySpeed, xpos, ypos, radius, life, maxSpeed;
 		void spawnProjectile(int, int, int, int, int, int);
 		void drawProjectile(sf::RenderWindow*);
 		void addSpeed(int, int);
@@ -56,6 +56,8 @@ void weapon::setGun(int D, int FR, int R, char S, int BS, int N)
 	style = S;
 	bulletSize = BS;
 	extra = N;
+
+	bulletSpeed = 7;
 }
 
 
@@ -103,6 +105,7 @@ void weapon::FireWeapon()
 				int xVelo = 0;
 				int yVelo = 0;
 				bool yShift = false;
+				bool xShift = false;
 				if(RIGHTpressed)
 				{
 					xVelo += 5;
@@ -116,22 +119,36 @@ void weapon::FireWeapon()
 				if(UPpressed)
 				{
 					yVelo -= 5;
+					xShift = true;
 				}
 				if(DOWNpressed)
 				{
 					yVelo += 5;
+					xShift = true;
 				}
 				for(int i = 0; i < extra; i++)
 				{
 					int offset = rand() % extra - (extra/2);
 					projectile Bullet;
-					if(yShift)
+					if(yShift && xShift)
 					{
-						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo, mainChar.yVel+yVelo+offset, bulletSize, range);
+						int up = rand() % 2;
+						if(up == 0)
+						{
+							Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo+2*offset, bulletSize, range);
+						}
+						else
+						{
+							Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo+2*offset, yVelo, bulletSize, range);
+						}
+					}
+					else if(yShift)
+					{
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo+offset, bulletSize, range);
 					}
 					else
 					{
-						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, mainChar.xVel+xVelo+offset, mainChar.yVel+yVelo, bulletSize, range);
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo+offset, yVelo, bulletSize, range);
 					}
 
 					AllProjectiles.push_back(Bullet);
@@ -215,6 +232,36 @@ int divRootTwo(int Value)
 
 }
 
+vector<int> velocityFix(int x, int y, int maxVel)
+{
+
+	vector<int> out = {};
+	double xd = static_cast<double>(x);
+	double yd = static_cast<double>(y);
+
+	int o = maxVel*sin(atan(yd/xd));
+	int a = maxVel*cos(atan(yd/xd));
+	if(x > 0)
+	{
+		a = abs(a);
+	}
+	else if(x < 0 && a > 0)
+	{
+		a = -1*a;
+	}
+	if(y > 0)
+	{
+		o = abs(o);
+	}
+	else if(x < 0 && o > 0)
+	{
+		o = -1*o;
+	}
+	out.push_back(static_cast<int>(a));
+	out.push_back(static_cast<int>(o));
+	return out;
+}
+
 void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int radii, int lifespan)
 {
 	Alive = true;
@@ -234,17 +281,14 @@ void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int rad
 	{
 		yVel = -5;
 	}
-	//FIXME
-	//Velocity is too high. It is the same when the player points both up and left for example
-	//V = sqrt(x*x +y*y)
-	//This means bullets go faster on the diagonal
-	//i can probably fix this? But thats why its fixme tagged.
-	if(xVel*xVel == yVel*yVel)
-	{
-		xVel = divRootTwo(xVel);
-		yVel = divRootTwo(yVel);
-	}
 
+	maxSpeed = FirstGun.bulletSpeed;
+	
+	//Fixed stupid velocty on the stupid bullets
+	//this required a lot of maths. ended up proving cos2(x) + sin2(x) = 1.  so that was fun
+	vector<int> vels = velocityFix(xVel, yVel, maxSpeed);
+	xVel = vels[0] + mainChar.xVel;
+	yVel = vels[1] + mainChar.yVel;
 
 	xpos = xPos+20;
 	ypos = yPos+20;

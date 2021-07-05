@@ -16,7 +16,44 @@ class SlimeEnemy {
 		void moveSlime();
 };
 
+class DeadSlime {
+	public:
+	        int xpos, ypos, radius, lifeSpan;
+	        void spawnDead(int, int, int, int);
+		void updateDead();
+		void drawDead(sf::RenderWindow*);	       
+};
+
 vector<SlimeEnemy> SlimeList;
+vector<DeadSlime> DeadList;
+
+void DeadSlime::drawDead(sf::RenderWindow* window)
+{
+	int xcent = xpos + radius;
+	int ycent = ypos + radius;
+
+	for(int i = 0; i < 8; i++)
+	{
+		sf::RectangleShape rectangle(sf::Vector2f(5.f, 20.f));
+		rectangle.setFillColor(sf::Color(255, 0, 0));
+		rectangle.setPosition(xcent, ycent);
+		rectangle.setRotation(360-45*i);
+		window->draw(rectangle);
+	}
+}
+
+void DeadSlime::updateDead()
+{
+	lifeSpan = lifeSpan - 1;
+}
+
+void DeadSlime::spawnDead(int x, int y, int rad, int life)
+{
+	xpos = x;
+	ypos = y;
+	radius = rad;
+	lifeSpan = life;
+}
 
 bool SlimeEnemy::hurtSlime(int damage)
 {
@@ -27,6 +64,9 @@ bool SlimeEnemy::hurtSlime(int damage)
 	if(health < 0)
 	{
 		Alive = false;
+		DeadSlime newSlime;
+		newSlime.spawnDead(xpos, ypos, curRadius, 20);
+		DeadList.push_back(newSlime);
 	}
 
 	hitCounter = 50;
@@ -80,7 +120,8 @@ void SlimeEnemy::moveSlime()
 {
 	int xDir = mainChar.xpos;
 	int yDir = mainChar.ypos;
-	//Move slime
+	//Move slimear
+	//
 	//Angle betwen slime and player = theta	
 	double theta = 0;
 	

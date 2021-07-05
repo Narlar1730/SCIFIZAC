@@ -71,12 +71,12 @@ void playGameThread()
 		}
 		if(Lpressed)
 		{
-			FirstGun.setGun(100, 30, 75, 'S', 8, 15);
+			FirstGun.setGun(100, 30, 75, 'S', 8, 5);
 		}
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
 		vector<SlimeEnemy> slimeVec{};
-		
+		vector<DeadSlime> deadVec{};
 		//Spawn New SLimes
 		if(gameclock%300 == 0)
 		{
@@ -125,8 +125,20 @@ void playGameThread()
 			}
 		}
 		
+		//Update dead
+		int deads = DeadList.size();
+		for(int i = 0; i < deads; i++)
+		{
+			DeadList[i].updateDead();
+			if(DeadList[i].lifeSpan > 0)
+			{
+				deadVec.push_back(DeadList[i]);
+			}	
+		}
+		
+		DeadList = deadVec;
 		AllProjectiles = newVec;
-
+		
 		unsigned int microsecond = 1000000;
 		usleep(0.005*microsecond);
 		gameclock+=1;
@@ -216,6 +228,12 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar,
 		AllProjectiles[i].drawProjectile(window);
 	}
 
+	//Draw Dead slimes
+	int numDead = DeadList.size();
+	for(int i = 0; i < numDead; i++)
+	{
+		DeadList[i].drawDead(window);
+	}
 
 	//Draw Slimes
 	int numSlimes = SlimeList.size();
