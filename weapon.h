@@ -44,19 +44,144 @@ vector<weapon> GroundWeapons;
 // Set init Weapon
 weapon FirstGun;
 
+sf::Color colourSelector(char Choice)
+{
+	sf::Color UnderGlow 	{  255, 255, 255, 0};
+	switch(Choice)
+		{
+			case 'R':
+				{
+					UnderGlow = {255,   0,   0,   5};
+					break;
+				}
+			case 'O':
+				{
+					UnderGlow = {255, 165,   0,   5};
+					break;
+				}
+			case 'Y':
+				{
+					UnderGlow = {255, 255,   0,  5};
+					break;
+				}
+			case 'G':
+				{
+					UnderGlow = {  0,  255,  0,  5};
+					break;
+				}
+			case 'B':
+				{
+					UnderGlow = {  0,   0, 255,  5};
+					break;
+				}
+			case 'I':
+				{
+					UnderGlow = { 75,   0, 130,  5};
+					break;
+				}
+			case 'V':
+				{
+					UnderGlow = {248, 130, 238,  5};
+					break;
+				}
+		}
+	return UnderGlow;
+
+}
+
+sf::Color incColourSelector(int inc)
+{
+	sf::Color output {100, 100, 100};
+	char selector = 'V';
+	if(inc == 0)
+	{
+		selector = 'R';
+	}
+	else if(inc == 1)
+	{
+		selector = 'O';
+	}
+	else if(inc == 2)
+	{
+		selector = 'Y';
+	}
+	else if(inc == 3)
+	{
+		selector = 'G';
+	}
+	else if(inc == 4)
+	{
+		selector = 'B';
+	}
+	else if(inc == 5)
+	{
+		selector = 'I';
+	}
+	else if(inc == 6)
+	{
+		selector = 'V';
+	}
+	output = colourSelector(selector);
+	return output;
+}
+
 void weapon::drawGroundWeapon(sf::RenderWindow* window)
 {
-	sf::Color GunGrey  {100, 100, 100};
-	sf::Color bandGrey { 80,  80,  80};
-	sf::Color black    {  0,   0,   0};
+	sf::Color GunGrey  	{100, 100, 100};
+	sf::Color bandGrey 	{ 80,  80,  80};
+	sf::Color black    	{  0,   0,   0};
+	sf::Color handleBrown   { 87,  65,  47};
+	//rarity = 'R';
+	sf::Color UnderGlow = colourSelector(rarity);
+
+	//Here we draw the underglow to show the rarity of the weapon. Its in roygbiv order for now. And I think I will keep it that way because I like it
+	//U rarity unique = rainbow
+	int glowRad = 50;
+	if(rarity == 'U')
+	{
+		int inc = gameclock % 210;
+		int selector = 0;
+		selector = selector + inc/30;
+		UnderGlow = incColourSelector(selector);
+		for(int i = 0; i < 10; i ++)
+		{
+			sf::CircleShape circle;
+			circle.setRadius(glowRad);
+			circle.setFillColor(UnderGlow);
+			circle.setPosition(xpos+i*3, ypos+i*3);
+			glowRad = glowRad - 3;
+			window->draw(circle);
+			sf::Color additive {0, 0, 0, 5};
+			UnderGlow = UnderGlow + additive;
+			selector += 1;
+		}		
+	}
+	else
+	{
+		for(int i = 0; i < 10; i ++)
+		{
+			sf::CircleShape circle;
+			circle.setRadius(glowRad);
+			circle.setFillColor(UnderGlow);
+			circle.setPosition(xpos+i*3, ypos+i*3);
+			glowRad = glowRad - 3;
+			window->draw(circle);
+			sf::Color additive {0, 0, 0, 5};
+			UnderGlow = UnderGlow + additive;
+		}
+	}
+
+	//Here we draw the weapons
 	switch(style)
 	{
 		case 'M':
 			{
+				int xOffset = 30;
+				int yOffset = 30;
 				for(int i = 0; i <3; i++)
 				{
 					sf::RectangleShape barrel(sf::Vector2f(60.f, 6.f));
-					barrel.setPosition(xpos, ypos+10*i);
+					barrel.setPosition(xpos+xOffset, ypos+10*i+yOffset);
 					barrel.setFillColor(GunGrey);
 					barrel.setOutlineColor(black);
 					barrel.setOutlineThickness(1);
@@ -65,12 +190,55 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 				for(int i = 0; i < 2; i++)
 				{
 					sf::RectangleShape band(sf::Vector2f(4.f, 30.f));
-					band.setPosition(xpos+10+i*35, ypos-2);
+					band.setPosition(xpos+10+i*35+xOffset, ypos-2+yOffset);
 					band.setFillColor(bandGrey);
 					band.setOutlineColor(black);
 					band.setOutlineThickness(1);
 					window->draw(band);
 				}
+				sf::RectangleShape box(sf::Vector2f(20.f, 40.f));
+				box.setPosition(xpos-20+xOffset, ypos - 5+yOffset);
+				box.setFillColor(bandGrey);
+				box.setOutlineColor(black);
+				box.setOutlineThickness(1);
+				window->draw(box);
+
+				sf::RectangleShape handle(sf::Vector2f(4.f, 16.f));
+				handle.setPosition(xpos-12+xOffset, ypos + 8+yOffset);
+				handle.setFillColor(black);
+				handle.setOutlineColor(black);
+				handle.setOutlineThickness(1);
+				window->draw(handle);
+				break;
+			}
+		case 'S':
+			{
+				int xOffset = 30;
+				int yOffset = 30;
+				
+				sf::RectangleShape handle(sf::Vector2f(20.f, 8.f));
+				handle.setPosition(xpos+xOffset+2, ypos+yOffset+10);
+				handle.setFillColor(handleBrown);
+				handle.setOutlineColor(black);
+				handle.setOutlineThickness(1);
+				handle.setRotation(135);
+				window->draw(handle);
+
+				
+				sf::RectangleShape barrel(sf::Vector2f(60.f, 8.f));
+				barrel.setPosition(xpos+xOffset, ypos+yOffset);
+				barrel.setFillColor(GunGrey);
+				barrel.setOutlineColor(black);
+				barrel.setOutlineThickness(1);
+				window->draw(barrel);
+				
+				sf::RectangleShape band(sf::Vector2f(20.f, 6.f));
+				band.setPosition(xpos+xOffset+15, ypos+yOffset+5);
+				band.setFillColor(GunGrey);
+				band.setOutlineColor(black);
+				band.setOutlineThickness(1);
+				window->draw(band);
+				
 				break;
 			}
 	}

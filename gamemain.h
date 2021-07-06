@@ -71,19 +71,21 @@ void playGameThread()
 		}
 		if(Lpressed)
 		{
+
 			//Set Shotgun
 			//FirstGun.setGun(100, 30, 75, 'S', 8, 5);
 			//Set minigun
-			FirstGun.setGun(30, 5, 75, 'M', 5, 0);
+			//FirstGun.setGun(30, 5, 75, 'M', 5, 0);
 		}
 		if(Epressed && GroundWeapons.size() == 0)
 		{
 			//Spawn Ground GUn
 			
 			weapon groundGun;
-			groundGun.setGun(30, 5, 75, 'M', 5, 0);
+			groundGun.setGun(100, 30, 75, 'S', 8, 5);
 			groundGun.xpos = 100;
 			groundGun.ypos = 100;
+			groundGun.rarity = 'R';
 			GroundWeapons.push_back(groundGun);
 		}
 		int NumProjectiles = AllProjectiles.size();
@@ -153,6 +155,23 @@ void playGameThread()
 			}	
 		}
 		
+
+		//Update ground weapons
+		vector<weapon> GroundWeaponsNew;
+		int numWeps = GroundWeapons.size();
+		for(int i = 0; i < numWeps; i++)
+		{
+			if(circleIntercept(GroundWeapons[i].xpos, GroundWeapons[i].ypos, 30, mainChar.xpos, mainChar.ypos, 40))
+			{
+				FirstGun = GroundWeapons[i];
+			}
+			else
+			{
+				GroundWeaponsNew.push_back(GroundWeapons[i]);
+			}
+		}
+		
+		GroundWeapons = GroundWeaponsNew;
 		DeadList = deadVec;
 		AllProjectiles = newVec;
 		
