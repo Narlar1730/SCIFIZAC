@@ -18,7 +18,8 @@ bool runningScreen = true;
 
 int gameclock = 1;
 Player mainChar;
-
+int buttonClickTimer = 0;
+#include "pausescreen.h"
 #include "weapon.h"
 #include "slimeEnemy.h"
 #include "Gameoverscreen.h"
@@ -28,7 +29,7 @@ Player mainChar;
 
 char DrawGameScreen(int, int, bool, Player, sf::RenderWindow*);
 
-
+bool pauseScreen = false;
 
 bool checkGunOut()
 {
@@ -69,15 +70,29 @@ void playGameThread()
 		{
 			FirstGun.FireWeapon();
 		}
-		if(Lpressed)
+		if(Epressed && buttonClickTimer == 0)
 		{
-
+			buttonClickTimer = 1000;
+			pauseScreen = true;
+			while(pauseScreen)
+			{
+				
+			}
 			//Set Shotgun
 			//FirstGun.setGun(100, 30, 75, 'S', 8, 5);
 			//Set minigun
 			//FirstGun.setGun(30, 5, 75, 'M', 5, 0);
 		}
-		if(Epressed && GroundWeapons.size() == 0)
+		else if(buttonClickTimer > 0)
+		{
+			buttonClickTimer -= 1;
+
+		}
+		else if(buttonClickTimer < 0)
+		{
+			buttonClickTimer = 0;
+		}
+		if(Lpressed && GroundWeapons.size() == 0)
 		{
 			//Spawn Ground GUn
 			
@@ -117,7 +132,7 @@ void playGameThread()
 				int Pxpos = AllProjectiles[j].xpos + Pradi;
 				int Pypos = AllProjectiles[j].ypos + Pradi;
 
-				if(circleIntercept(slimeX, slimeY, slimeR, Pxpos, Pypos, Pradi) || Epressed)
+				if(circleIntercept(slimeX, slimeY, slimeR, Pxpos, Pypos, Pradi))
 				{
 					SlimeList[i].hurtSlime(100);
 					AllProjectiles[j].Alive = false;
@@ -290,6 +305,11 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar,
 	//Draw Player
 	mainChar.drawPlayer(window);
 	
+	if(pauseScreen)
+	{
+		pauseScreen = drawPauseScreen(mousex, mousey, MouseReleased, window);
+	}
+
 	//Display screen
 	window->display();
 	window->clear();

@@ -343,7 +343,7 @@ void weapon::FireWeapon()
 				}
 				for(int i = 0; i < extra; i++)
 				{
-					int offset = rand() % extra - (extra/2);
+					int offset = rand() % 3 - 1;
 					projectile Bullet;
 					if(yShift && xShift)
 					{
@@ -359,11 +359,11 @@ void weapon::FireWeapon()
 					}
 					else if(yShift)
 					{
-						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo+offset, bulletSize, range);
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo-offset, yVelo+offset, bulletSize, range);
 					}
 					else
 					{
-						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo+offset, yVelo, bulletSize, range);
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo+offset, yVelo-offset, bulletSize, range);
 					}
 
 					AllProjectiles.push_back(Bullet);
