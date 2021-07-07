@@ -12,6 +12,7 @@ using namespace std;
 // Rifle, 1 long as it stands, this is what we have
 // Shotgun - S
 // Rifle - R
+/*
 class weapon {
 	public:
 		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
@@ -20,11 +21,11 @@ class weapon {
 		void drawHeldWeapon(sf::RenderWindow*);
 		void drawGroundWeapon(sf::RenderWindow*);
 		void setGun(int, int, int, char, int, int);
-};
+};*/
 
 class projectile {
 	public: 
-		int xSpeed, ySpeed, xpos, ypos, radius, life, maxSpeed;
+		int xSpeed, ySpeed, xpos, ypos, radius, life, maxSpeed, colour;
 		void spawnProjectile(int, int, int, int, int, int);
 		void drawProjectile(sf::RenderWindow*);
 		void addSpeed(int, int);
@@ -43,6 +44,87 @@ vector<weapon> GroundWeapons;
 
 // Set init Weapon
 weapon FirstGun;
+
+char intToRar(int val)
+{
+	char output = ' ';
+	switch(val)
+	{
+		case 0:
+			output = 'R';
+			break;
+		case 1:
+			output = 'O';
+			break;
+		case 2:
+			output = 'Y';
+			break;
+		case 3:
+			output = 'G';
+			break;
+		case 4:
+			output = 'B';
+			break;
+		case 5:
+			output = 'I';
+			break;
+		case 6:
+			output = 'V';
+			break;
+		case 7:
+			output = 'U';
+			break;
+		default:
+			output = ' ';
+			break;	
+	}
+	return output;
+}
+
+void spawnRandomGun(int x, int y)
+{
+	weapon newGun;
+	int DamMod = rand () % 10;
+	int FRMod = rand () % 5;
+	int type = rand() % 4 + 1;
+	int RangeMod = rand() % 6;
+	int SizeMod = rand() % 10;
+	int extra = rand() % 5; 
+	int xrand = x;
+	int yrand = y;
+	char rar = intToRar(rand() % 8);
+	switch(type)
+	{
+		case 1:
+			newGun.setGun(100-5*DamMod, 50-5*FRMod, 75-4*RangeMod, 'S', 21 - 2*SizeMod, 5);
+			break;
+		case 2:
+			newGun.setGun(50-2*DamMod, 10-FRMod, 100-4*RangeMod, 'M', 10-SizeMod, extra);
+			break;
+		case 3:
+			newGun.setGun(150-10*DamMod, 50-5*FRMod, 150-4*RangeMod, 'R', 21 - 2*SizeMod, 5);
+			break;
+		case 4:
+			newGun.setGun(DamMod+1, 100+10*FRMod, 0, 'L', 11-SizeMod, extra);
+			
+						
+	}
+
+	newGun.xpos = xrand;
+	newGun.ypos = yrand;
+	newGun.rarity = rar;
+	GroundWeapons.push_back(newGun);
+
+
+}
+
+
+void spawnRandomGun()
+{
+	int xrand = rand() % 1600;
+	int yrand = rand() % 1600;
+	spawnRandomGun(xrand, yrand);	
+}
 
 sf::Color colourSelector(char Choice)
 {
@@ -131,6 +213,7 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 	sf::Color bandGrey 	{ 80,  80,  80};
 	sf::Color black    	{  0,   0,   0};
 	sf::Color handleBrown   { 87,  65,  47};
+	sf::Color white         {255, 255, 255};
 	//rarity = 'R';
 	sf::Color UnderGlow = colourSelector(rarity);
 
@@ -174,6 +257,34 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 	//Here we draw the weapons
 	switch(style)
 	{
+		case 'L':
+			{
+				int xOffset = 30;
+				int yOffset = 30;
+
+				for(int i = 0; i < 3; i++)
+				{
+					sf::RectangleShape nodule(sf::Vector2f(6.f, 8.f));
+					nodule.setPosition(xpos+xOffset+10+8*i, ypos + yOffset);
+					nodule.setFillColor(white);
+					nodule.setOutlineColor(black);
+					nodule.setOutlineThickness(1);
+					window->draw(nodule);
+				}
+				
+				sf::RectangleShape laser(sf::Vector2f(60.f, 8.f));
+				laser.setPosition(xpos+xOffset+5, ypos+yOffset+2);
+				sf::Color LaserColor = colourSelector((intToRar(extra % 7)));
+				laser.setFillColor(LaserColor);
+				window->draw(laser);
+				
+
+				sf::RectangleShape barrel(sf::Vector2f(60.f, 12.f));
+				barrel.setPosition(xpos+xOffset, ypos+yOffset);
+				barrel.setFillColor(black);
+				window->draw(barrel);
+				break;
+			}
 		case 'M':
 			{
 				int xOffset = 30;
@@ -241,6 +352,37 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 				
 				break;
 			}
+		case 'R':
+			{
+				int xOffset = 30;
+				int yOffset = 30;
+
+				sf::RectangleShape handle(sf::Vector2f(20.f, 8.f));
+				handle.setPosition(xpos+xOffset+2, ypos+yOffset+10);
+				handle.setFillColor(handleBrown);
+				handle.setOutlineColor(black);
+				handle.setOutlineThickness(1);
+				handle.setRotation(135);
+				window->draw(handle);
+
+				
+				sf::RectangleShape barrel(sf::Vector2f(70.f, 6.f));
+				barrel.setPosition(xpos+xOffset, ypos+yOffset);
+				barrel.setFillColor(GunGrey);
+				barrel.setOutlineColor(black);
+				barrel.setOutlineThickness(1);
+				window->draw(barrel);
+				
+				sf::RectangleShape scope(sf::Vector2f(20.f, 6.f));
+				scope.setPosition(xpos+xOffset+15, ypos+yOffset-5);
+				scope.setFillColor(GunGrey);
+				scope.setOutlineColor(black);
+				scope.setOutlineThickness(1);
+				window->draw(scope);
+				
+				break;
+
+			}
 	}
 }
 
@@ -288,6 +430,57 @@ void weapon::FireWeapon()
 				Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos, xVelo, yVelo, bulletSize, range);
 				AllProjectiles.push_back(Bullet);	
 				break;
+				}
+			case 'L':
+				{
+				int siz = bulletSize;
+				int rang = 15;
+				int FireSet = 20;
+				if(RIGHTpressed)
+				{
+					for(int i = 0; i < 200; i++)
+					{
+						projectile Bullet;
+						Bullet.spawnProjectile(mainChar.xpos+i*FireSet, mainChar.ypos, 0, 0, siz, rang);
+						Bullet.colour=extra;
+						AllProjectiles.push_back(Bullet);
+					}
+				}
+				else if(LEFTpressed)
+				{
+					for(int i = 0; i < 200; i++)
+					{
+						projectile Bullet;
+						Bullet.spawnProjectile(mainChar.xpos-i*FireSet, mainChar.ypos, 0, 0, siz, rang);
+						Bullet.colour=extra;
+						AllProjectiles.push_back(Bullet);
+					}
+
+				}
+				else if(UPpressed)
+				{
+					for(int i = 0; i < 200; i++)
+					{
+						projectile Bullet;
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos-i*FireSet, 0, 0, siz, rang);
+						Bullet.colour=extra;
+						AllProjectiles.push_back(Bullet);
+					}
+
+				}
+				else if(DOWNpressed)
+				{
+					for(int i = 0; i < 200; i++)
+					{
+						projectile Bullet;
+						Bullet.spawnProjectile(mainChar.xpos, mainChar.ypos+i*FireSet, 0, 0, siz, rang);
+						Bullet.colour=extra;
+						AllProjectiles.push_back(Bullet);
+					}
+
+				}
+				break;
+
 				}
 			case 'M':
 				{
@@ -499,7 +692,7 @@ void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int rad
 	}
 
 	maxSpeed = FirstGun.bulletSpeed;
-	
+	colour = -1;
 	//Fixed stupid velocty on the stupid bullets
 	//this required a lot of maths. ended up proving cos2(x) + sin2(x) = 1.  so that was fun
 	vector<int> vels = velocityFix(xVel, yVel, maxSpeed);
@@ -534,8 +727,13 @@ void projectile::drawProjectile(sf::RenderWindow* window)
 {
 	sf::Color bulletColour {180, 100, 100};
 	sf::Color black        {  0,   0,   0};
-
+	
 	sf::CircleShape bullet;
+	if(colour != -1)
+	{
+		bulletColour = colourSelector(intToRar(colour%7));
+		bullet.setOutlineThickness(1);
+	}
 	bullet.setRadius(radius);
 	bullet.setFillColor(bulletColour);
 	bullet.setOutlineColor(black);

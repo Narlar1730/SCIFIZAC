@@ -1,4 +1,4 @@
-bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, sf::RenderWindow* window)
+bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown, sf::RenderWindow* window)
 {
 	bool output = true;
 
@@ -10,13 +10,8 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, sf::RenderWindo
 	{
 		buttonClickTimer -= 1;
 	}
-	//Just removing warnings for things I will need later.
-	if(mousex == mousey)
-	{
-	}
-	else if(MouseReleased)
-	{
-	}
+
+	bool MOUSEClicked = mouseDown;
 	
 	//Set Colours
 	sf::Color backgroundColour    {160, 160, 160, 160};
@@ -38,8 +33,8 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, sf::RenderWindo
 	outershell.setOutlineColor(black);
 	outershell.setOutlineThickness(2);
 	window->draw(outershell);
-
-	//draw inventory shells
+	//draw inventory boxes
+	int highlightedBox = -1;
 	for(int i = 0; i < 8; i ++)
 	{
 		for(int j = 0; j < 3; j++)
@@ -52,10 +47,53 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, sf::RenderWindo
 			if(currentBox.getGlobalBounds().contains(mousex, mousey))
 			{
 				currentBox.setFillColor(buttonColourHover);
-			}
+				highlightedBox = i+8*j;
+			}		
+			
 			window->draw(currentBox);
+			
+
 		}
 	}
+	//draw inventory shells
+	int numInventory = mainChar.weaponInventory.size();
+	for(int i = 0; i < numInventory; i++)
+	{
+		weapon curGun = mainChar.weaponInventory[i];
+		curGun.xpos = 315 + (i % 8)*150;
+		int j = 0;
+		if(i >= 8)
+		{
+			j = 1;
+		}
+		if(i >= 16)
+		{
+			j = 2;
+		}
+		curGun.ypos = 1065 + j*150;
+		if(mouseDown && highlightedBox == i && mainChar.CurSel == -1)
+		{
+			mainChar.CurSel = i;
+		}
+		if(mainChar.CurSel == i)
+		{
+			curGun.xpos = mousex;
+			curGun.ypos = mousey;
+		}
+
+
+		curGun.drawGroundWeapon(window);
+	}
+	
+
+
+	if(MouseReleased)
+	{
+		mainChar.CurSel = -1;
+	}
+	
+	
+	
 
 	//Draw Crafting Menu
 	for(int i = 0; i < 2; i++)

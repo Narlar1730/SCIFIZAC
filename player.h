@@ -1,13 +1,27 @@
 //#include "keyBoardManagement.h"
+//
+
+class weapon {
+	public:
+		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
+		char style, rarity;
+		void FireWeapon();
+		void drawHeldWeapon(sf::RenderWindow*);
+		void drawGroundWeapon(sf::RenderWindow*);
+		void setGun(int, int, int, char, int, int);
+};
 
 class Player {
 	public:
 		int xpos, ypos, xVel, yVel, firerate, maxHealth, curHealth, painBuffer;
 		int speed = 20;
+		int CurSel = -1;
+		int inventorysize = 24;
 		void hurtPlayer(int);
 		void setInitValues(int, int);
 		void drawPlayer(sf::RenderWindow*);
 		bool MoveCharacter();
+		vector<weapon> weaponInventory;
 };
 
 void Player::hurtPlayer(int hurt)

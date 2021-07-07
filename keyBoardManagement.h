@@ -23,6 +23,7 @@ bool DOWNpressed  = false;
 bool LEFTpressed  = false;
 bool RIGHTpressed = false;
 
+bool MOUSEpressed = false;
 
 void performKeyPress()
 {
@@ -132,5 +133,16 @@ void performKeyPress()
 	{
 		DOWNpressed = false;
 	}
+
+	//Here we handle the mouse
+	if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		MOUSEpressed = true;
+	}
+	else
+	{
+		MOUSEpressed = false;
+	}
+
 }
 

@@ -17,6 +17,7 @@
 
 using namespace std;
 
+
 void removeVectorDups(vector<char> vec)
 {
 	sort(vec.begin(), vec.end());

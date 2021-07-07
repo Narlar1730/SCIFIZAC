@@ -27,10 +27,12 @@ int buttonClickTimer = 0;
 //you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
 //to make sure that we don't get anything weird happen
 
-char DrawGameScreen(int, int, bool, Player, sf::RenderWindow*);
+char DrawGameScreen(int, int, bool, bool, Player, sf::RenderWindow*);
 
 bool pauseScreen = false;
 
+
+//Function to check if gun is out
 bool checkGunOut()
 {
 	bool gunOut = false;
@@ -41,6 +43,7 @@ bool checkGunOut()
 	return gunOut;
 }
 
+//Circle intercept function
 bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 {
 	bool intercept = false;
@@ -60,6 +63,7 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 void playGameThread()
 {
 	FirstGun.setGun(100, 30, 150, 'R', 12, 0);
+	FirstGun.rarity = 'R';
 	while (runningScreen)
 	{
 		bool Firing = checkGunOut();
@@ -92,17 +96,21 @@ void playGameThread()
 		{
 			buttonClickTimer = 0;
 		}
-		if(Lpressed && GroundWeapons.size() == 0)
+		/*if(Lpressed && GroundWeapons.size() == 0)
 		{
-			//Spawn Ground GUn
-			
+			spawnRandomGun();
 			weapon groundGun;
 			groundGun.setGun(100, 30, 75, 'S', 8, 5);
 			groundGun.xpos = 100;
 			groundGun.ypos = 100;
-			groundGun.rarity = 'R';
+			groundGun.rarity = 'U';
 			GroundWeapons.push_back(groundGun);
-		}
+			weapon laserGun;
+			laserGun.setGun(2, 100, 75, 'L', 8, 3);
+			laserGun.xpos = 100;
+			laserGun.ypos = 100;
+			GroundWeapons.push_back(laserGun);
+		}*/
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
 		vector<SlimeEnemy> slimeVec{};
@@ -146,6 +154,15 @@ void playGameThread()
 			{
 				slimeVec.push_back(SlimeList[i]);
 			}
+			else
+			{
+				int DropChance = 101;
+				int roll100 = rand() % 100;
+				if(roll100 < DropChance)
+				{
+					spawnRandomGun(slimeX, slimeY);
+				}
+			}
 		}
 
 		SlimeList = slimeVec;
@@ -176,8 +193,10 @@ void playGameThread()
 		int numWeps = GroundWeapons.size();
 		for(int i = 0; i < numWeps; i++)
 		{
-			if(circleIntercept(GroundWeapons[i].xpos, GroundWeapons[i].ypos, 30, mainChar.xpos, mainChar.ypos, 40))
+			if(circleIntercept(GroundWeapons[i].xpos, GroundWeapons[i].ypos, 30, mainChar.xpos, mainChar.ypos, 40) && mainChar.weaponInventory.size() < 24)
 			{
+				weapon newGun = FirstGun;
+				mainChar.weaponInventory.push_back(newGun);
 				FirstGun = GroundWeapons[i];
 			}
 			else
@@ -218,13 +237,6 @@ void GameScreen(sf::RenderWindow* window)
 		bool MouseDown = false;
 		bool MouseReleased = false;
 		
-		//FIXME
-		//I know I will need mouse down, Just not yet.
-		if(MouseDown)
-		{
-		
-		}
-
 		while(window->pollEvent(event))
 		{
 			if(event.type == sf::Event::MouseButtonReleased)
@@ -237,7 +249,7 @@ void GameScreen(sf::RenderWindow* window)
 			}
 		}
 
-		next = DrawGameScreen(MouseX, MouseY, MouseReleased, mainChar, window);
+		next = DrawGameScreen(MouseX, MouseY, MouseReleased, MouseDown, mainChar, window);
 		if(next != 's')
 		{
 			runningScreen = false;
@@ -248,18 +260,8 @@ void GameScreen(sf::RenderWindow* window)
 
 }
 
-char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar, sf::RenderWindow* window)
+char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, Player mainChar, sf::RenderWindow* window)
 {
-	//Just removing warnings for things I will need later.
-	if(mousex == mousey)
-	{
-	}
-	else if(MouseReleased)
-	{
-	}
-
-
-
 	//Init variables, colours, etc.
 	char outPut = 's';
 	sf::Color backgroundColour {160, 160, 160};
@@ -307,7 +309,7 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, Player mainChar,
 	
 	if(pauseScreen)
 	{
-		pauseScreen = drawPauseScreen(mousex, mousey, MouseReleased, window);
+		pauseScreen = drawPauseScreen(mousex, mousey, MouseReleased, MouseDown, window);
 	}
 
 	//Display screen
