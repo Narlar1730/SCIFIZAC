@@ -8,21 +8,6 @@
 
 using namespace std;
 
-// Different weapons fire different style shots. ie. Shotgun, many short.
-// Rifle, 1 long as it stands, this is what we have
-// Shotgun - S
-// Rifle - R
-/*
-class weapon {
-	public:
-		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
-		char style, rarity;
-		void FireWeapon();
-		void drawHeldWeapon(sf::RenderWindow*);
-		void drawGroundWeapon(sf::RenderWindow*);
-		void setGun(int, int, int, char, int, int);
-};*/
-
 class projectile {
 	public: 
 		int xSpeed, ySpeed, xpos, ypos, radius, life, maxSpeed, colour;
@@ -92,7 +77,40 @@ void spawnRandomGun(int x, int y)
 	int extra = rand() % 5; 
 	int xrand = x;
 	int yrand = y;
-	char rar = intToRar(rand() % 8);
+	//TODO - rarity is currently random. Need to add extra features based on randomness. 
+	int rarity = rand() % 100;
+	char rar;
+	if(rarity < 60)
+	{
+		rar = 'R';
+	}
+	else if(rarity < 75)
+	{
+		rar = 'O';
+	}
+	else if(rarity < 85)
+	{
+		rar = 'Y';
+	}
+	else if(rarity < 90)
+	{
+		rar = 'G';
+	}
+	else if(rarity < 94)
+	{
+		rar = 'B';
+	}
+	else if(rarity < 97)
+	{
+		rar = 'I';
+	}
+	else
+	{
+		rar = 'V';
+	}
+	//Set Rarity
+	newGun.rarity = rar;
+	//char rar = intToRar(rand() % 8);
 	switch(type)
 	{
 		case 1:
@@ -112,7 +130,6 @@ void spawnRandomGun(int x, int y)
 
 	newGun.xpos = xrand;
 	newGun.ypos = yrand;
-	newGun.rarity = rar;
 	GroundWeapons.push_back(newGun);
 
 
@@ -171,6 +188,52 @@ sf::Color colourSelector(char Choice)
 
 }
 
+sf::Color colourSelectorNoOpaque(char Choice)
+{
+	sf::Color output;
+	switch(Choice)
+		{
+			case 'R':
+				{
+					output = {255,   0,   0};
+					break;
+				}
+			case 'O':
+				{
+					output = {255, 165,   0};
+					break;
+				}
+			case 'Y':
+				{
+					output = {255, 255,   0};
+					break;
+				}
+			case 'G':
+				{
+					output = {  0,  255,  0};
+					break;
+				}
+			case 'B':
+				{
+					output = {  0,   0, 255};
+					break;
+				}
+			case 'I':
+				{
+					output = { 75,   0, 130};
+					break;
+				}
+			case 'V':
+				{
+					output = {248, 130, 238};
+					break;
+				}
+		}
+	return output;
+
+
+}
+
 sf::Color incColourSelector(int inc)
 {
 	sf::Color output {100, 100, 100};
@@ -205,6 +268,97 @@ sf::Color incColourSelector(int inc)
 	}
 	output = colourSelector(selector);
 	return output;
+}
+
+string charToRarity(char c)
+{
+	string output;
+	switch(c)
+	{
+			case 'R':
+				output = "Common";
+				break;
+			case 'O':
+				output = "Uncommon";
+				break;
+			case 'Y':
+				output = "Rare";
+				break;
+			case 'G':
+				output = "Ultra rare";
+				break;
+			case 'B':
+				output = "Legendary";
+				break;
+			case 'I':
+				output = "Demonic";
+				break;
+			case 'V':
+				output = "Godlike";
+				break;
+
+	}
+	return output;
+}
+
+void weapon::drawStats(int x, int y, sf::RenderWindow* window)
+{
+	sf::Color backGroundGrey { 40,  40,  40, 200};
+	sf::Color black          {  0,   0,   0};
+	sf::Color white          {255, 255, 255};
+	// Draw background
+	sf::RectangleShape backBlock(sf::Vector2f(400.f, 600.f));
+	backBlock.setFillColor(backGroundGrey);
+	backBlock.setOutlineColor(black);
+	backBlock.setOutlineThickness(2);
+	backBlock.setPosition(x-430, y);
+	window->draw(backBlock);
+
+	// Draw Name
+	sf::Text name1;
+	name1.setFont(font);
+	name1.setString(name);
+	name1.setCharacterSize(30);
+	name1.setFillColor(colourSelectorNoOpaque(rarity));
+	name1.setPosition(x-410, y+10);
+	window->draw(name1);
+
+	// Display stats
+	sf::Text Text1;
+	Text1.setFont(font);
+	Text1.setString("Damage: " + std::to_string(damage));
+	Text1.setCharacterSize(30);
+	Text1.setFillColor(white);
+	Text1.setPosition(x-410, y+90);
+	window->draw(Text1);
+
+	sf::Text Text4;
+	Text4.setFont(font);
+	Text4.setString("Bullet size: " + std::to_string(bulletSize));
+	Text4.setCharacterSize(30);
+	Text4.setFillColor(white);
+	Text4.setPosition(x-410, y+130);
+	window->draw(Text4);
+
+	sf::Text Text2;
+	Text2.setFont(font);
+	Text2.setString("Fire rate: " + std::to_string(firerate));
+	Text2.setCharacterSize(30);
+	Text2.setFillColor(white);
+	Text2.setPosition(x-410, y+170);
+	window->draw(Text2);
+
+	sf::Text Text3;
+	Text3.setFont(font);
+	Text3.setString("Range: " + std::to_string(range));
+	Text3.setCharacterSize(30);
+	Text3.setFillColor(white);
+	Text3.setPosition(x-410, y+210);
+	window->draw(Text3);
+
+
+
+
 }
 
 void weapon::drawGroundWeapon(sf::RenderWindow* window)
@@ -386,6 +540,32 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 	}
 }
 
+string generateName(char style, char rarity)
+{
+	string output = charToRarity(rarity);
+	string words[10] = {"pain", "suffering", "happiness", "thunder", "speed", "power", "fire", "love", "bullets", "damage"};
+	switch(style)
+	{
+		case 'S':
+			output += " shotgun of ";
+			break;
+		case 'R':
+			output += " rifle of ";
+			break;
+		case 'M':
+			output += " minigun of ";
+			break;
+		case 'L':
+			output += " laser of ";
+			break;
+	}
+
+	int index = rand() % 10;
+	output += words[index];
+
+	return output;
+}
+
 void weapon::setGun(int D, int FR, int R, char S, int BS, int N)
 {
 	damage = D;
@@ -396,6 +576,8 @@ void weapon::setGun(int D, int FR, int R, char S, int BS, int N)
 	extra = N;
 
 	bulletSpeed = 7;
+
+	name = generateName(S, rarity);
 }
 
 

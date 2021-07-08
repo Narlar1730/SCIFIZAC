@@ -11,8 +11,6 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 		buttonClickTimer -= 1;
 	}
 
-	bool MOUSEClicked = mouseDown;
-	
 	//Set Colours
 	sf::Color backgroundColour    {160, 160, 160, 160};
 	sf::Color buttonColourNoHover {120, 120, 120};
@@ -35,6 +33,7 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 	window->draw(outershell);
 	//draw inventory boxes
 	int highlightedBox = -1;
+	int numInventory = mainChar.weaponInventory.size();
 	for(int i = 0; i < 8; i ++)
 	{
 		for(int j = 0; j < 3; j++)
@@ -48,15 +47,13 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 			{
 				currentBox.setFillColor(buttonColourHover);
 				highlightedBox = i+8*j;
-			}		
-			
+			}			
 			window->draw(currentBox);
 			
 
 		}
 	}
 	//draw inventory shells
-	int numInventory = mainChar.weaponInventory.size();
 	for(int i = 0; i < numInventory; i++)
 	{
 		weapon curGun = mainChar.weaponInventory[i];
@@ -80,12 +77,49 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 			curGun.xpos = mousex;
 			curGun.ypos = mousey;
 		}
-
-
+		
 		curGun.drawGroundWeapon(window);
-	}
-	
+		
+		
 
+	}
+	//Here we are drawing the overlay boxes. I don't like that I am looping twice through the same loop but there has to be a solution
+	for(int i = 0; i < numInventory; i++)
+	{
+
+		weapon curGun = mainChar.weaponInventory[i];
+		int xpos = 315 + (i % 8)*150;
+		int j = 0;
+		if(i >= 8)
+		{
+			j = 1;
+		}
+		if(i >= 16)
+		{
+			j = 2;
+		}
+		int ypos = 1065 + j*150;
+
+		if(ypos > 1200)
+		{
+			ypos = 1200;
+		}
+
+		
+		if(highlightedBox == i)
+		{
+			if(xpos < 600)
+			{
+				curGun.drawStats(xpos+570, ypos - 10, window);	
+			}
+			else
+			{
+				curGun.drawStats(xpos+10, ypos - 10, window);
+			}
+		}
+
+
+	}
 
 	if(MouseReleased)
 	{
@@ -141,13 +175,20 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 		//Draw numbers
 		sf::Text t1;
 		t1.setFont(font);
-		t1.setString(std::to_string(i));
+		t1.setString(std::to_string(i+1));
 		t1.setPosition(420+i*160, 820);
 		t1.setCharacterSize(160);
 		t1.setFillColor(white_opaque);
 		t1.setStyle(sf::Text::Bold);
 		window->draw(t1);
 	}
+	//Draw 1 slot
+	//Fixme
+	weapon FirstGun;
+	FirstGun.xpos = 390+30;
+	FirstGun.ypos = 850+30;
+	FirstGun.drawGroundWeapon(window);
+	
 
 	//Draw x button
 	sf::RectangleShape exitButton(sf::Vector2f(40.f, 30.f));

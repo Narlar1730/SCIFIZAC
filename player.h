@@ -4,11 +4,13 @@
 class weapon {
 	public:
 		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
+		string name;
 		char style, rarity;
 		void FireWeapon();
 		void drawHeldWeapon(sf::RenderWindow*);
 		void drawGroundWeapon(sf::RenderWindow*);
 		void setGun(int, int, int, char, int, int);
+		void drawStats(int, int, sf::RenderWindow*);
 };
 
 class Player {
