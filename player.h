@@ -5,6 +5,7 @@ class weapon {
 	public:
 		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
 		string name;
+		int inventoryIndex = -1;
 		char style, rarity;
 		void FireWeapon();
 		void drawHeldWeapon(sf::RenderWindow*);
@@ -13,11 +14,15 @@ class weapon {
 		void drawStats(int, int, sf::RenderWindow*);
 };
 
+//Declaring gun
+weapon FirstGun;
+
 class Player {
 	public:
 		int xpos, ypos, xVel, yVel, firerate, maxHealth, curHealth, painBuffer;
 		int speed = 20;
 		int CurSel = -1;
+		bool justClicked = false;
 		int inventorysize = 24;
 		void hurtPlayer(int);
 		void setInitValues(int, int);

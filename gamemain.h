@@ -19,9 +19,11 @@ bool runningScreen = true;
 int gameclock = 1;
 Player mainChar;
 int buttonClickTimer = 0;
-#include "pausescreen.h"
 #include "weapon.h"
+#include "inventory.h"
+#include "pausescreen.h"
 #include "slimeEnemy.h"
+#include "tankEnemy.h"
 #include "Gameoverscreen.h"
 //Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
 //you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
@@ -62,7 +64,8 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 
 void playGameThread()
 {
-	FirstGun.setGun(100, 30, 150, 'R', 12, 0);
+	initInventory();
+	FirstGun.setGun(100, 2, 150, 'M', 12, 0);
 	FirstGun.rarity = 'R';
 	while (runningScreen)
 	{
@@ -96,28 +99,19 @@ void playGameThread()
 		{
 			buttonClickTimer = 0;
 		}
-		/*if(Lpressed && GroundWeapons.size() == 0)
-		{
-			spawnRandomGun();
-			weapon groundGun;
-			groundGun.setGun(100, 30, 75, 'S', 8, 5);
-			groundGun.xpos = 100;
-			groundGun.ypos = 100;
-			groundGun.rarity = 'U';
-			GroundWeapons.push_back(groundGun);
-			weapon laserGun;
-			laserGun.setGun(2, 100, 75, 'L', 8, 3);
-			laserGun.xpos = 100;
-			laserGun.ypos = 100;
-			GroundWeapons.push_back(laserGun);
-		}*/
+
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
 		vector<SlimeEnemy> slimeVec{};
+		vector<tankEnemy> tankVec{};
+		vector<DeadTank> deadTanks{};
 		vector<DeadSlime> deadVec{};
 		//Spawn New SLimes
 		if(gameclock%300 == 0)
 		{
+			tankEnemy FirstTank;
+			FirstTank.spawnTank();
+			TankList.push_back(FirstTank);
 			SlimeEnemy FirstSlime;
 			FirstSlime.spawnSlime();
 			SlimeList.push_back(FirstSlime);
@@ -156,7 +150,7 @@ void playGameThread()
 			}
 			else
 			{
-				int DropChance = 101;
+				int DropChance = 10;
 				int roll100 = rand() % 100;
 				if(roll100 < DropChance)
 				{
@@ -166,6 +160,47 @@ void playGameThread()
 		}
 
 		SlimeList = slimeVec;
+		// Update Tanks
+		int numTanks = TankList.size();
+		for(int i = 0; i < numTanks; i++)
+		{
+			TankList[i].moveTank();
+			tankEnemy CurTank = TankList[i];
+			int TankR = CurTank.curRadius;
+			int TankX = CurTank.xpos;
+			int TankY = CurTank.ypos;
+			for(int j = 0; j < NumProjectiles; j++)
+			{
+				int Pradi = AllProjectiles[j].radius;
+				int Pxpos = AllProjectiles[j].xpos + Pradi;
+				int Pypos = AllProjectiles[j].ypos + Pradi;
+
+				if(circleIntercept(TankX, TankY, TankR, Pxpos, Pypos, Pradi))
+				{
+					TankList[i].hurtTank(100);
+					AllProjectiles[j].Alive = false;
+				}
+			}
+			if(circleIntercept(TankX, TankY, TankR, mainChar.xpos, mainChar.ypos, 40))
+			{
+				mainChar.hurtPlayer(1);
+			}
+			if(TankList[i].health > 0)
+			{
+				tankVec.push_back(TankList[i]);
+			}
+			else
+			{
+				int DropChance = 10;
+				int roll100 = rand() % 100;
+				if(roll100 < DropChance)
+				{
+					spawnRandomGun(TankX, TankY);
+				}
+			}
+		}
+		TankList = tankVec;
+
 		// Update bullet position
 		for(int i = 0; i < NumProjectiles; i++)
 		{
@@ -186,6 +221,15 @@ void playGameThread()
 				deadVec.push_back(DeadList[i]);
 			}	
 		}
+		int numDeadTanks = DeadTanks.size();
+		for(int i = 0; i < numDeadTanks; i++)
+		{
+			DeadTanks[i].updateDead();
+			if(DeadTanks[i].lifeSpan > 0)
+			{
+				deadTanks.push_back(DeadTanks[i]);
+			}
+		}
 		
 
 		//Update ground weapons
@@ -193,21 +237,42 @@ void playGameThread()
 		int numWeps = GroundWeapons.size();
 		for(int i = 0; i < numWeps; i++)
 		{
-			if(circleIntercept(GroundWeapons[i].xpos, GroundWeapons[i].ypos, 30, mainChar.xpos, mainChar.ypos, 40) && mainChar.weaponInventory.size() < 24)
+			bool weaponAdded = false;
+			if(circleIntercept(GroundWeapons[i].xpos, GroundWeapons[i].ypos, 30, mainChar.xpos, mainChar.ypos, 40))
 			{
-				weapon newGun = FirstGun;
-				mainChar.weaponInventory.push_back(newGun);
-				FirstGun = GroundWeapons[i];
+				weapon CurWep = GroundWeapons[i];
+				weaponAdded = insertWeapon(CurWep);
 			}
-			else
+			if(!weaponAdded)
 			{
 				GroundWeaponsNew.push_back(GroundWeapons[i]);
-			}
+			}	
 		}
 		
+		//Update Enemy shots
+		vector<enemyProjectile> newEnemyShots;
+		int numEnemyShots = enemyShots.size();
+		for(int i = 0; i < numEnemyShots; i++)
+		{
+			bool alive = enemyShots[i].moveProjectile();
+			
+			if(circleIntercept(enemyShots[i].xpos, enemyShots[i].ypos, enemyShots[i].radius, mainChar.xpos, mainChar.ypos, 40))
+			{
+				mainChar.hurtPlayer(1);
+
+			}
+			else if(alive)
+			{
+				newEnemyShots.push_back(enemyShots[i]);
+			}
+
+		}
+
 		GroundWeapons = GroundWeaponsNew;
 		DeadList = deadVec;
+		DeadTanks = deadTanks;
 		AllProjectiles = newVec;
+		enemyShots = newEnemyShots;
 		
 		unsigned int microsecond = 1000000;
 		usleep(0.005*microsecond);
@@ -297,11 +362,32 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		DeadList[i].drawDead(window);
 	}
 
+	//Draw Dead Tanks
+	int numDeadTanks = DeadTanks.size();
+	for(int i = 0; i < numDeadTanks; i++)
+	{
+		DeadTanks[i].drawDead(window);
+	}
+
 	//Draw Slimes
 	int numSlimes = SlimeList.size();
 	for(int i = 0; i < numSlimes; i++)
 	{
 		SlimeList[i].drawSlime(window);
+	}
+	
+	//Draw Enemy Shots
+	int numEnemyShots = enemyShots.size();
+	for(int i = 0; i < numEnemyShots; i++)
+	{
+		enemyShots[i].drawProjectile(window);
+	}
+
+	//Draw Tanks
+	int numTanks = TankList.size();
+	for(int i = 0; i < numTanks; i++)
+	{
+		TankList[i].drawTank(window);
 	}
 
 	//Draw Player

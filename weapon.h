@@ -27,9 +27,6 @@ vector<projectile> AllProjectiles;
 //Ground Weapon List
 vector<weapon> GroundWeapons;
 
-// Set init Weapon
-weapon FirstGun;
-
 char intToRar(int val)
 {
 	char output = ' ';
