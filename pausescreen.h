@@ -55,88 +55,45 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 	//draw inventory shells
 	//
 	//HANDLE MOUSE CLICKSKSKSKSSKS
+	vector<weapon> itemsToDraw;
 	for(int i = 0; i < 24; i++)
 	{
-		char curVal = masterlist[i];
-		if(curVal == 'W')
+		
+		weapon curItem = getItem(i);
+		curItem.xpos = 315 +(i % 8)*150;
+		int j = 0;
+		if(i >= 16)
 		{
-			weapon curWep = getWeapon(i);
-			curWep.xpos = 315 +(i % 8)*150;
-			int j = 0;
-			if(i >= 16)
-			{
-				j = 2;
-			}
-			else if(i >= 8)
-			{
-				j = 1;
-			}
-			curWep.ypos = 1065 + j*150;
-			if(mouseDown && highlightedBox == i && mainChar.CurSel == -1)
-			{
-				mainChar.CurSel = i;
-			}
-			else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox != -1)
-			{
-				bool inserted = insertWeapon(curWep, highlightedBox);
-				if(inserted)
-				{
-					removeWeapon(curWep);
-				}
-				else
-				{
-					swapWeapon(highlightedBox, mainChar.CurSel);
-				}
-				
-			}
-			if(mainChar.CurSel == i)
-			{
-				curWep.xpos = mousex;
-				curWep.ypos = mousey;
-			}
-			curWep.drawGroundWeapon(window);
+			j = 2;
 		}
+		else if(i >= 8)
+		{
+			j = 1;
+		}
+		curItem.ypos = 1065 + j*150;
+		if(mouseDown && highlightedBox == i && mainChar.CurSel == -1 && inventory[i].itemType != 'E')
+		{
+			mainChar.CurSel = i;
+		}
+		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == i)
+		{
+			bool inserted = insertWeapon(curItem, highlightedBox);
+			swapWeapon(highlightedBox, mainChar.CurSel);
+			mainChar.CurSel = -1;	
+						
+		}
+		if(mainChar.CurSel == i)
+		{
+			curItem.xpos = mousex;
+			curItem.ypos = mousey;
+		}
+		itemsToDraw.push_back(curItem);
+		//curItem.drawItem(window);
 	}
-	
-	//Here we are drawing the overlay boxes. I don't like that I am looping twice through the same loop but there has to be a solution
-	if(!MOUSEpressed)
+	/*if(MouseReleased)
 	{
-		for(int i = 0; i < 24; i++)
-		{
-			char curVal = masterlist[i];
-			if(curVal == 'W')
-			{
-				weapon curGun = getWeapon(i);
-				int xpos = 315 + (i%8)*150;
-				int j = 0;
-				if(i >= 16)
-				{
-					j = 2;
-				}
-				if(i >= 8)
-				{
-					j = 1;
-				}
-				int ypos = 1065 + j*150;
-				if(ypos > 1200)
-				{
-					ypos = 1200;
-				}
-				if(highlightedBox == i)
-				{
-					if(xpos < 600)
-					{
-						curGun.drawStats(xpos+570, ypos - 10, window);
-					}
-					else
-					{
-					
-						curGun.drawStats(xpos+10, ypos - 10, window);
-					}
-				}
-			}
-		}
-	}
+		printItems();
+	}*/
 	if(MouseReleased)
 	{
 		mainChar.CurSel = -1;
@@ -201,6 +158,7 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 		window->draw(t1);
 	}
 	//Draw 1 slot
+	
 	FirstGun.xpos = 390+30;
 	FirstGun.ypos = 850+30;
 	FirstGun.drawGroundWeapon(window);	
@@ -212,7 +170,7 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 	{	
 		FirstGun.drawStats(FirstGun.xpos+715, FirstGun.ypos - 10, window);
 	}
-
+	
 	//Draw x button
 	sf::RectangleShape exitButton(sf::Vector2f(40.f, 30.f));
 	exitButton.setPosition(10, 10);
@@ -226,6 +184,52 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 	exitText.setFillColor(black);
 	exitText.setStyle(sf::Text::Bold);
 	exitText.setPosition(18, 8);
+	
+	//Draw items in inventory.
+	for(int i = 0; i < 24; i++)
+	{
+		weapon curItem = itemsToDraw[i];
+		curItem.drawItem(window);
+	}
+	//Here we are drawing the overlay boxes. I don't like that I am looping twice through the same loop but there has to be a solution
+	if(!MOUSEpressed)
+	{
+		for(int i = 0; i < 24; i++)
+		{
+			char curVal = inventory[i].itemType;
+			if(curVal == 'W')
+			{
+				weapon curGun = getItem(i);
+				int xpos = 315 + (i%8)*150;
+				int j = 0;
+				if(i >= 16)
+				{
+					j = 2;
+				}
+				if(i >= 8)
+				{
+					j = 1;
+				}
+				int ypos = 1065 + j*150;
+				if(ypos > 1200)
+				{
+					ypos = 1200;
+				}
+				if(highlightedBox == i)
+				{
+					if(xpos < 600)
+					{
+						curGun.drawStats(xpos+570, ypos - 10, window);
+					}
+					else
+					{
+					
+						curGun.drawStats(xpos+10, ypos - 10, window);
+					}
+				}
+			}
+		}
+	}
 
 	//Dynamic buttons!
 	if(exitButton.getGlobalBounds().contains(mousex, mousey))

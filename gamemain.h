@@ -65,7 +65,7 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 void playGameThread()
 {
 	initInventory();
-	FirstGun.setGun(100, 2, 150, 'M', 12, 0);
+	FirstGun.setGun(100, 2, 150, 'L', 12, 4);
 	FirstGun.rarity = 'R';
 	while (runningScreen)
 	{

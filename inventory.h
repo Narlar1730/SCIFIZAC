@@ -4,129 +4,94 @@
 */
 vector<char> masterlist;
 vector<weapon> weaponInventory;
+vector<weapon> inventory;
 
+void swapWeapon(int, int);
 bool insertWeapon(weapon);
 bool insertWeapon(weapon, int);
 weapon getWeapon(int);
+void removeItem(int);
+
+void printItems()
+{
+	for(int i = 0; i < 24; i++)
+	{
+		if(i < 10)
+		{
+			cout << "Item at index: " << i << "  is: " << inventory[i].name << "\n";
+		}
+		else
+		{
+			cout << "Item at index: " << i << " is: " << inventory[i].name << "\n";
+		}
+	}
+	cout << "\n";
+}
+
+void removeItem(int index)
+{
+	weapon newItem;
+	newItem.itemType = 'E';
+	inventory[index] = newItem;
+}
+
+weapon getItem(int index)
+{
+	weapon curItem = inventory[index];
+	return curItem;
+}
 
 void initInventory()
 {
 	weaponInventory = {};
 	for(int i = 0; i < 24; i++)
 	{
-		masterlist.push_back('E');
+		weapon newItem;
+		newItem.itemType = 'E';
+		inventory.push_back(newItem);
 	}
 }
 
-void removeWeapon(weapon w)
+/*bool insertWeapon(weapon w)
 {
-	int index = w.inventoryIndex;
-	int numWeps = weaponInventory.size();
-	for(int i = 0; i < numWeps; i++)
-	{
-		if(weaponInventory[i].inventoryIndex == index)
-		{
-			weaponInventory.erase(weaponInventory.begin()+i);
-		}
-	}
-	masterlist[index] = 'E';
-}
+
+}*/
 
 bool insertWeapon(weapon w)
 {
 	bool output = false;
-	
-	int insertPos = -1;
 	for(int i = 0; i < 24; i++)
 	{
-		char curVal = masterlist[i];
-		if(curVal == 'E')
+		weapon curItem = inventory[i];
+		if(curItem.itemType == 'E')
 		{
-			insertPos = i;
+			inventory[i] = w;
+			output = true;
 			break;
 		}
 	}
-
-	if(insertPos != -1)
-	{
-		output = insertWeapon(w, insertPos);
-		
-	}
-	
-
-
-	return output;	
-}
-
-bool insertWeapon(weapon w, int i)
-{
-	bool output = false;
-
-	if(masterlist[i] == 'E')
-	{
-		masterlist[i] = 'W';
-		w.inventoryIndex = i;
-		weaponInventory.push_back(w);
-		output = true;
-	}
-
 	return output;
 }
 
-weapon getWeapon(int i)
+bool insertWeapon(weapon w, int index)
 {
-	weapon w1;
-	int numweps = weaponInventory.size();
-	for(int j = 0; j < numweps; j++)
-	{
-		weapon curwep = weaponInventory[j];
-		if(i == curwep.inventoryIndex)
-		{
-			w1 = curwep;
-		}
-	}
-
-	return w1; 
+	inventory[index] = w;
+	return true;
 }
 
-void setWeapon(weapon w1, int index)
+void swapWeapon(int w1, int w2)
 {
-	int numWeps = weaponInventory.size();
-	for(int i = 0; i < numWeps; i++)
-	{
-		weapon curWep = weaponInventory[i];
-		if(curWep.inventoryIndex == index)
-		{
-			weaponInventory[i] = w1;	
-		}
-	}	
+	//printItems();
+
+	//cout << "Swap Items\n";
+
+	weapon weapon1 = inventory[w1];
+	weapon weapon2 = inventory[w2];
+
+	inventory[w1] = weapon2;
+	inventory[w2] = weapon1;
+
+	//printItems();
 }
 
-bool swapWeapon(int oldSlot, int newSlot)
-{
-	bool success = false;
-	weapon w1;
-	weapon w2;
-	
-	/*{
-		printf("\x1b[31mERR: Insert Failed, could not insert into list\033[0m\n");
-		exit(0);
-	}*/
-	
-	
-	w1 = getWeapon(oldSlot);
-	w2 = getWeapon(newSlot);
-	int w1Pos = w1.inventoryIndex;
-	int w2Pos = w2.inventoryIndex;
-
-	w1.inventoryIndex = w2Pos;
-	w2.inventoryIndex = w1Pos;
-
-	setWeapon(w1, w2Pos);
-	setWeapon(w2, w1Pos);
-	success = true;
-
-		
-	return success;
-}
 

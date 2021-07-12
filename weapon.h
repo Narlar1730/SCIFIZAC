@@ -66,6 +66,7 @@ char intToRar(int val)
 void spawnRandomGun(int x, int y)
 {
 	weapon newGun;
+	newGun.itemType = 'W';
 	int DamMod = rand () % 10;
 	int FRMod = rand () % 5;
 	int type = rand() % 4 + 1;
@@ -360,6 +361,13 @@ void weapon::drawStats(int x, int y, sf::RenderWindow* window)
 
 void weapon::drawGroundWeapon(sf::RenderWindow* window)
 {
+	drawItem(window);
+}
+
+void weapon::drawItem(sf::RenderWindow* window)
+{
+
+	//cout << "XPOS: " << xpos << " YPOS: " << ypos << "\n";
 	sf::Color GunGrey  	{100, 100, 100};
 	sf::Color bandGrey 	{ 80,  80,  80};
 	sf::Color black    	{  0,   0,   0};
@@ -367,7 +375,12 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 	sf::Color white         {255, 255, 255};
 	//rarity = 'R';
 	sf::Color UnderGlow = colourSelector(rarity);
-
+	
+	//If itemtpye is E don't draw anythign
+	if(itemType == 'E')
+	{
+		return;
+	}
 	//Here we draw the underglow to show the rarity of the weapon. Its in roygbiv order for now. And I think I will keep it that way because I like it
 	//U rarity unique = rainbow
 	int glowRad = 50;
@@ -425,7 +438,7 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 				
 				sf::RectangleShape laser(sf::Vector2f(60.f, 8.f));
 				laser.setPosition(xpos+xOffset+5, ypos+yOffset+2);
-				sf::Color LaserColor = colourSelector((intToRar(extra % 7)));
+				sf::Color LaserColor = colourSelectorNoOpaque((intToRar(extra % 7)));
 				laser.setFillColor(LaserColor);
 				window->draw(laser);
 				
@@ -910,8 +923,8 @@ void projectile::drawProjectile(sf::RenderWindow* window)
 	sf::CircleShape bullet;
 	if(colour != -1)
 	{
-		bulletColour = colourSelector(intToRar(colour%7));
-		bullet.setOutlineThickness(1);
+		bulletColour = colourSelectorNoOpaque(intToRar(colour%7));
+		bullet.setOutlineThickness(0);
 	}
 	bullet.setRadius(radius);
 	bullet.setFillColor(bulletColour);
