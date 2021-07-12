@@ -77,7 +77,6 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 		}
 		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == i)
 		{
-			bool inserted = insertWeapon(curItem, highlightedBox);
 			swapWeapon(highlightedBox, mainChar.CurSel);
 			mainChar.CurSel = -1;	
 						

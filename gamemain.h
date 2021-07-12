@@ -10,6 +10,7 @@
 #include <sstream>
 #include <math.h>
 #include <time.h>
+#include "obstacles.h"
 #include "player.h"
 //#include "slimeEnemy.h"
 using namespace std;
@@ -65,6 +66,7 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 void playGameThread()
 {
 	initInventory();
+	initMap();
 	FirstGun.setGun(100, 2, 150, 'L', 12, 4);
 	FirstGun.rarity = 'R';
 	while (runningScreen)
@@ -106,7 +108,8 @@ void playGameThread()
 		vector<tankEnemy> tankVec{};
 		vector<DeadTank> deadTanks{};
 		vector<DeadSlime> deadVec{};
-		//Spawn New SLimes
+		//Spawn New Enemies
+		
 		if(gameclock%300 == 0)
 		{
 			tankEnemy FirstTank;
@@ -389,6 +392,21 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 	{
 		TankList[i].drawTank(window);
 	}
+
+	//Draw obstacles
+	obstacle tree;
+	tree.xpos = 100;
+	tree.ypos = 100;
+	tree.type = 'T';
+	tree.drawObstacle(window);
+
+	//Draw Walls
+	int numObsts = mapPiece.size();
+	for(int i = 0; i < numObsts; i++)
+	{
+		mapPiece[i].drawObstacle(window);
+	}
+	
 
 	//Draw Player
 	mainChar.drawPlayer(window);

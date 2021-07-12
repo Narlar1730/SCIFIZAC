@@ -127,23 +127,23 @@ void Player::drawPlayer(sf::RenderWindow* window)
 	}
 
 	//Draw healthbar.
-	sf::RectangleShape backBar(sf::Vector2f(1600.f, 20.f));
-	backBar.setPosition(100, 1700);
+	sf::RectangleShape backBar(sf::Vector2f(1500.f, 20.f));
+	backBar.setPosition(150, 1650);
 	backBar.setFillColor(GunGrey);
 	backBar.setOutlineColor(black);
 	backBar.setOutlineThickness(4);
 	//Calculate length
-	float healthLength = (static_cast<float>(curHealth) / static_cast<float>(maxHealth)) * 1592.f;	
+	float healthLength = (static_cast<float>(curHealth) / static_cast<float>(maxHealth)) * 1492.f;	
 	//cout << healthLength << "\n";
 	sf::RectangleShape healthBar(sf::Vector2f(healthLength, 12.f));
-	healthBar.setPosition(104, 1704);
+	healthBar.setPosition(154, 1654);
 	healthBar.setFillColor(red);
 
 
 	//Draw objects in the right order
+	window->draw(circle);
 	window->draw(backBar);
 	window->draw(healthBar);
-	window->draw(circle);
 
 }
 
@@ -212,9 +212,91 @@ bool Player::MoveCharacter()
 		yVel = divRootTwoToo(yVel);
 	}
 
+		
+	//Perform collisions
+	int numObsts = mapPiece.size();
+	for(int i = 0; i < numObsts; i++)
+	{
+		obstacle curObst = mapPiece[i];
+		int rectX = curObst.xpos-50;
+		int rectY = curObst.ypos-50;
+		int size  = 120;
+		
+		int testx = xpos;
+		int testy = ypos;
+
+		bool checkLeft = false;
+		bool checkRight = false;
+		bool checkUp = false;
+		bool checkDown = false;
+
+		if(xpos+20 < rectX)
+		{
+			checkLeft = true;
+			testx = rectX;
+		}
+		else if(xpos > rectX + size)
+		{
+			checkRight = true;
+			testx = rectX + size;
+		}
+
+		if(ypos+20 < rectY)
+		{
+			checkUp = true;
+			testy = rectY;
+		}
+		else if(ypos > rectY + size)
+		{
+			checkDown = true;
+			testy = rectY+size;	
+		}
+
+		float distX = xpos - testx;
+		float distY = ypos - testy;
+		float distance = sqrt((distX*distX) + (distY*distY));
+		if(distance <= 40)
+		{
+			if(checkLeft)
+			{
+				xpos = rectX - 40;
+				if(xVel > 0)
+				{
+					xVel = 0;
+				}
+
+			}
+			if(checkRight)
+			{
+				
+				xpos = rectX + 160;
+				if(xVel < 0)
+				{
+					xVel = 0;
+				}
+			}
+			if(checkUp)
+			{
+				ypos = rectY- 40;
+				if(yVel > 0)
+				{
+					yVel = 0;
+				}
+			}
+			if(checkDown)
+			{
+				ypos = rectY + 160;
+				if(yVel < 0)
+				{
+					yVel = 0;
+				}
+			}
+		}
+	}
+	
 	xpos = xpos + xVel;
 	ypos = ypos + yVel;
-	
+
 	//Reduce pain buffer
 	if(painBuffer <= 0)
 	{
