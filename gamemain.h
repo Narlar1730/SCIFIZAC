@@ -16,6 +16,7 @@
 using namespace std;
 //Handle interface running
 bool runningScreen = true;
+bool runningGame = true;
 
 int gameclock = 1;
 Player mainChar;
@@ -26,11 +27,12 @@ int buttonClickTimer = 0;
 #include "slimeEnemy.h"
 #include "tankEnemy.h"
 #include "Gameoverscreen.h"
-//Game Clock! to get things to happen at certain times. I did the maths, if you run the game for 24 days striaght
-//you will run into a buffer overflow. Sooooooo don't do that I guess? maybe I will put a check in there for later
-//to make sure that we don't get anything weird happen
+#include "map.h"
+
+Map curMap;
 
 char DrawGameScreen(int, int, bool, bool, Player, sf::RenderWindow*);
+void playGameThread();
 
 bool pauseScreen = false;
 
@@ -63,16 +65,46 @@ bool circleIntercept(int x1, int y1, int r1, int x2, int y2, int r2)
 	return intercept;
 }
 
+void loadNextRoom()
+{
+	//Reset Some things, not sure?
+	runningScreen = true;
+	playGameThread();
+}
+
 void playGameThread()
 {
-	initInventory();
-	initMap();
-	FirstGun.setGun(100, 2, 150, 'L', 12, 4);
-	FirstGun.rarity = 'R';
+	//initInventory();
+	//initMap();
+	//curMap.genMap();
+	//generateFloor();
+	int numRooms = Floor.size();
+	for(int i = 0; i < numRooms; i++)
+	{
+		if(Floor[i].currentRoom)
+		{
+			curMap = Floor[i];
+			mapPiece = curMap.pieces;
+			if(curMap.cleared)
+			{
+				SlimeList.clear();
+				TankList.clear();
+			}
+			else
+			{
+				SlimeList = curMap.SlimeEnemies;
+				TankList = curMap.TankEnemies;
+			}
+		}
+	}
+	//FirstGun.setGun(500, 50, 150, 'R', 12, 0);
+	//FirstGun.rarity = 'R';
+	int index = 0;
+	char whatToDo = 'G';
 	while (runningScreen)
 	{
 		bool Firing = checkGunOut();
-
+		index ++;
 		runningScreen = mainChar.MoveCharacter();
 		//If gameclock ready spawn new shot
 		if(Firing)
@@ -109,7 +141,7 @@ void playGameThread()
 		vector<DeadTank> deadTanks{};
 		vector<DeadSlime> deadVec{};
 		//Spawn New Enemies
-		
+		/*	
 		if(gameclock%300 == 0)
 		{
 			tankEnemy FirstTank;
@@ -118,7 +150,7 @@ void playGameThread()
 			SlimeEnemy FirstSlime;
 			FirstSlime.spawnSlime();
 			SlimeList.push_back(FirstSlime);
-		}
+		}*/
 		
 		// Update slime position
 		int numSlimes = SlimeList.size();
@@ -139,7 +171,7 @@ void playGameThread()
 
 				if(circleIntercept(slimeX, slimeY, slimeR, Pxpos, Pypos, Pradi))
 				{
-					SlimeList[i].hurtSlime(100);
+					SlimeList[i].hurtSlime(FirstGun.damage);
 					AllProjectiles[j].Alive = false;
 				}
 			}
@@ -180,7 +212,7 @@ void playGameThread()
 
 				if(circleIntercept(TankX, TankY, TankR, Pxpos, Pypos, Pradi))
 				{
-					TankList[i].hurtTank(100);
+					TankList[i].hurtTank(FirstGun.damage);
 					AllProjectiles[j].Alive = false;
 				}
 			}
@@ -270,18 +302,113 @@ void playGameThread()
 			}
 
 		}
+		if(numTanks == 0 && numSlimes == 0)
+		{
+			curMap.openDoors();
+		}
 
 		GroundWeapons = GroundWeaponsNew;
 		DeadList = deadVec;
 		DeadTanks = deadTanks;
 		AllProjectiles = newVec;
 		enemyShots = newEnemyShots;
-		
+	
+		//Check if moving onto nextRoom;
+		int curx = mainChar.xpos;
+		int cury = mainChar.ypos;
+		if(curx > 1701)
+		{
+			whatToDo = 'R';
+			cout << "right\n";
+			runningScreen = false;
+		}
+		if(curx < 59)
+		{
+			whatToDo = 'L';
+			cout << "left\n";
+			runningScreen = false;
+		}
+		if(cury > 1701)
+		{
+			whatToDo = 'D';
+			cout << "down\n";
+			runningScreen = false;
+		}
+		if(cury < 59)
+		{
+			whatToDo = 'U';
+			cout << "up\n";
+			runningScreen = false;
+		}
+
 		unsigned int microsecond = 1000000;
 		usleep(0.005*microsecond);
 		gameclock+=1;
 	}
 
+	int mapx = curMap.xpos;
+	int mapy = curMap.ypos;
+	bool nextRoom = false;
+	switch(whatToDo)
+	{
+		case 'R':
+			{
+				mapx = mapx+1;
+				nextRoom = true;
+				mainChar.xpos = 150;
+				break;
+			}
+		case 'L':
+			{
+				mapx = mapx-1;
+				mainChar.xpos = 1650;
+				nextRoom = true;
+				break;
+			}
+		case 'U':
+			{
+				mapy = mapy-1;
+				nextRoom = true;
+				mainChar.ypos = 1650;
+				break;
+			}
+		case 'D':
+			{
+				mapy = mapy+1;
+				nextRoom = true;
+				mainChar.ypos = 150;
+				break;
+			}
+		case 'Q':
+			{
+				runningGame = false;
+				break;
+			}
+	}
+	if(nextRoom)
+	{
+		int numRooms = Floor.size();
+		for(int i = 0; i < numRooms; i++)
+		{
+			int curxx = Floor[i].xpos;
+			int curyy = Floor[i].ypos;
+			if(curxx == curMap.xpos && curyy == curMap.ypos)
+			{
+				Floor[i].cleared = true;
+			}
+			if(curxx == mapx && curyy == mapy)
+			{
+				Floor[i].currentRoom = true;
+				Floor[i].discovered  = true;
+				
+			}
+			else
+			{
+				Floor[i].currentRoom = false;
+			}
+		}
+		loadNextRoom();
+	}
 
 }
 
@@ -291,12 +418,16 @@ void GameScreen(sf::RenderWindow* window)
 	char next;
 	mainChar.setInitValues(900, 900);
 	//This thread handles the game stuff. Seperated them in order to have the game render quicker
-	//
+	//	
 	
+	initInventory();
+	generateFloor();
+	FirstGun.setGun(500, 50, 150, 'R', 12, 0);
+	FirstGun.rarity = 'R';	
 	sf::Thread thread(&playGameThread);
 	thread.launch();
 	//This loop updates the screen and draws the picture.
-	while(runningScreen)
+	while(runningGame)
 	{
 		sf::Event event;
 		sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
@@ -333,7 +464,9 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 	//Init variables, colours, etc.
 	char outPut = 's';
 	sf::Color backgroundColour {160, 160, 160};
-	sf::Color black {0, 0, 0};
+	sf::Color black            {  0,   0  , 0};
+	sf::Color white            {255, 255, 255};
+	sf::Color minimap	   { 40,  40,  40, 180};
 	
 	//Clear the window before we draw
 	window->clear();
@@ -372,6 +505,13 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		DeadTanks[i].drawDead(window);
 	}
 
+	//Draw Enemy Shots
+	int numEnemyShots = enemyShots.size();
+	for(int i = 0; i < numEnemyShots; i++)
+	{
+		enemyShots[i].drawProjectile(window);
+	}
+		
 	//Draw Slimes
 	int numSlimes = SlimeList.size();
 	for(int i = 0; i < numSlimes; i++)
@@ -379,13 +519,6 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		SlimeList[i].drawSlime(window);
 	}
 	
-	//Draw Enemy Shots
-	int numEnemyShots = enemyShots.size();
-	for(int i = 0; i < numEnemyShots; i++)
-	{
-		enemyShots[i].drawProjectile(window);
-	}
-
 	//Draw Tanks
 	int numTanks = TankList.size();
 	for(int i = 0; i < numTanks; i++)
@@ -393,20 +526,39 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		TankList[i].drawTank(window);
 	}
 
-	//Draw obstacles
-	obstacle tree;
-	tree.xpos = 100;
-	tree.ypos = 100;
-	tree.type = 'T';
-	tree.drawObstacle(window);
-
 	//Draw Walls
 	int numObsts = mapPiece.size();
 	for(int i = 0; i < numObsts; i++)
 	{
 		mapPiece[i].drawObstacle(window);
 	}
-	
+
+	//Draw outline and inline?
+	sf::RectangleShape flatLine(sf::Vector2f(1800.f, 2.f));
+	flatLine.setPosition(0, 0);
+	flatLine.setFillColor(white);
+	window->draw(flatLine);
+	flatLine.setPosition(0, 1800);
+	window->draw(flatLine);
+	sf::RectangleShape innerLine(sf::Vector2f(1600.f, 2.f));
+	innerLine.setPosition(100, 100);
+	innerLine.setFillColor(white);
+	window->draw(innerLine);
+	innerLine.setPosition(100, 1700);
+	window->draw(innerLine);
+
+	sf::RectangleShape downLine(sf::Vector2f(2.f, 1800.f));
+	downLine.setPosition(0, 0);
+	downLine.setFillColor(white);
+	window->draw(downLine);
+	downLine.setPosition(1800, 0);
+	window->draw(downLine);
+	sf::RectangleShape smallLine(sf::Vector2f(2.f, 1600.f));
+	smallLine.setPosition(100, 100);
+	smallLine.setFillColor(white);
+	window->draw(smallLine);
+	smallLine.setPosition(1700, 100);
+	window->draw(smallLine);
 
 	//Draw Player
 	mainChar.drawPlayer(window);
@@ -416,6 +568,29 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		pauseScreen = drawPauseScreen(mousex, mousey, MouseReleased, MouseDown, window);
 	}
 
+	//Draw Minimap
+	sf::RectangleShape minimap1(sf::Vector2f(250.f, 250.f));
+	minimap1.setPosition(1400, 150);
+	minimap1.setFillColor(minimap);
+	minimap1.setOutlineColor(black);
+	minimap1.setOutlineThickness(2);
+	window->draw(minimap1);
+	int discRooms = Floor.size();
+	for(int i = 0; i < discRooms; i++)
+	{
+		Map curRoom = Floor[i];
+		sf::RectangleShape room(sf::Vector2f(48.f, 48.f));
+		sf::Color sideRoom  {130, 130, 130};
+		if(curRoom.currentRoom)
+		{
+			sideRoom = {200, 200, 200};
+		}
+		room.setPosition(1500+50*curRoom.xpos, 250+50*curRoom.ypos);
+		room.setFillColor(sideRoom);
+		room.setOutlineColor(white);
+		room.setOutlineThickness(2);
+		window->draw(room);
+	}
 	//Display screen
 	window->display();
 	window->clear();

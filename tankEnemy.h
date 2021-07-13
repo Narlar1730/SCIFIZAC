@@ -5,7 +5,8 @@
  */
 class tankEnemy {
 	public:
-		int xpos, ypos, curRadius, init_size, r, g, b, hitCounter;
+		int xpos, ypos, curRadius, init_size, r, g, b;
+		int hitCounter = 0;
 		int health = init_size*50;
 		int countdownReset = 160; 
 		int countdown = countdownReset;

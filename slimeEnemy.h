@@ -5,7 +5,8 @@
  */
 class SlimeEnemy {
 	public:
-		int xpos, ypos, curRadius, init_size, r, g, b, hitCounter;
+		int xpos, ypos, curRadius, init_size, r, g, b;
+		int hitCounter = 0;
 		int health = init_size*10;
 		int speed = 10;
 		bool growing;
