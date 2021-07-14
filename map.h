@@ -6,11 +6,14 @@ class Map{
 		sf::Color          background;
 		sf::Color          complement;
 		sf::Color          outlineCol;
-		int                xpos, ypos;         // Room POS
+		int                xpos, ypos;          // Room POS
 		bool 		   discovered  = false; // Fog of war
 		bool		   currentRoom = false;
 		bool		   cleared     = false;	
-		void               genRandMap();       // Generate Random Map
+		bool		   generated   = false;
+		vector<char>       getSurroundingRooms();
+		vector<char>	   getFreeSurroundingRooms();
+		void               genRandMap();        // Generate Random Map
 		void		   genSpecMap(char type);
 		void		   openDoors();
 };
@@ -34,6 +37,74 @@ void Map::openDoors()
 	mapPiece = output;
 }
 
+vector<char> Map::getFreeSurroundingRooms()
+{
+	vector<char> all {'D', 'L', 'U', 'R'};
+	vector<char> surrounding = getSurroundingRooms();
+	int numAround = all.size();
+	vector<char> out;
+	for(int i = 0; i < numAround; i++)
+	{
+		char curVal = all[i];
+		if(!count(surrounding.begin(), surrounding.end(), curVal))
+		{
+			out.push_back(curVal);
+		}
+	}
+	return out;
+}
+
+vector<char> Map::getSurroundingRooms()
+{
+	vector<char> out;
+	int numRooms = Floor.size();
+	for(int i = 0; i < numRooms; i++)
+	{
+		Map curRoom = Floor[i];
+		if(xpos - curRoom.xpos == -1 && ypos == curRoom.ypos)
+		{
+			out.push_back('R');
+		}
+		else if(xpos - curRoom.xpos == 1 && ypos == curRoom.ypos) 
+		{
+			out.push_back('L');		
+		}
+		else if(ypos - curRoom.ypos == -1 && xpos == curRoom.xpos)
+		{
+			out.push_back('D');
+		}
+		else if(ypos - curRoom.ypos == 1 && xpos == curRoom.xpos)
+		{
+			out.push_back('U');
+		}
+	}
+
+	int numOut = out.size();
+	return out;
+}
+
+vector<Map> freeSlotRooms;
+
+int numRoomsWithFreeSlots()
+{
+	freeSlotRooms.clear();
+	int output = 0;
+	int size   = Floor.size();
+	for(int i = 0; i < size; i ++)
+	{
+		Map curRoom = Floor[i];
+		vector<char> CurSur = curRoom.getSurroundingRooms();
+		if(CurSur.size() < 4)
+		{
+			output += 1;
+			freeSlotRooms.push_back(curRoom);
+		}
+	}
+
+	return output;
+	
+}
+
 void generateFloor()
 {
 	int NumRooms = 6+(rand()%5+1);
@@ -43,30 +114,93 @@ void generateFloor()
 	initRoom.discovered  = true;
 	initRoom.currentRoom = true;
 	initRoom.cleared     = true;
-	initRoom.genSpecMap('O');
+	initRoom.generated   = true;
+	//initRoom.genSpecMap('O');
 	Floor.push_back(initRoom);
 
 	for(int i = -1; i < 2; i+=2)
 	{
 		Map curRoom;
-		curRoom.xpos = i;
-		curRoom.ypos = 0;
-		curRoom.discovered = true;
-		curRoom.genSpecMap('R');
-		Floor.push_back(curRoom);
-
 		Map curRoom2;
+		curRoom.xpos  = i;
 		curRoom2.xpos = 0;
+		curRoom.ypos  = 0;
 		curRoom2.ypos = i;
-		curRoom2.discovered = true;
-		curRoom2.genSpecMap('R');
+		Floor.push_back(curRoom);
 		Floor.push_back(curRoom2);
+
+
 	}
-		
+	
+	for(int i = 0; i < NumRooms; i++)
+	{
+		Map curRoom;
+		int numCurRooms = numRoomsWithFreeSlots();
+		int whichRoom = rand() % numCurRooms;
+		Map freeRoom = freeSlotRooms[whichRoom];
+		//This makes sense that it is backwards
+		vector<char> availableRooms = freeRoom.getFreeSurroundingRooms();
+		int numFree = rand() % availableRooms.size();
+		char direction = availableRooms[numFree];
+		switch(direction)
+		{
+			case 'U':
+				curRoom.xpos = freeRoom.xpos;
+				curRoom.ypos = freeRoom.ypos-1;
+				break;
+			case 'D':
+				curRoom.xpos = freeRoom.xpos;
+				curRoom.ypos = freeRoom.ypos+1;
+				break;
+			case 'L':
+				curRoom.xpos = freeRoom.xpos + 1;
+				curRoom.ypos = freeRoom.ypos;
+				break;
+			case 'R':
+				curRoom.xpos = freeRoom.xpos - 1;
+				curRoom.ypos = freeRoom.ypos;
+				break;
+		}
+		Floor.push_back(curRoom);
+	}
+	
+	int madeRooms = Floor.size();
+	for(int i = 0; i < madeRooms; i ++)
+	{
+		Map curRoom = Floor[i];
+		if(!curRoom.generated)
+		{
+			curRoom.genSpecMap('R');
+			curRoom.discovered = true;
+			curRoom.generated  = true;
+			Floor[i] = curRoom;
+		}
+		else
+		{
+			curRoom.genSpecMap('O');
+			curRoom.discovered = true;
+			curRoom.generated = true;
+			curRoom.currentRoom = true;
+			Floor[i] = curRoom;
+		}
+	}
 }
 
 void Map::genSpecMap(char type)
 {
+	vector<char> around = getSurroundingRooms();
+
+	int numRoomsAround = around.size();
+	/*for(int i = 0; i < 4; i++)
+	{
+		char current = around[i];
+		if(current == 'R')
+		{
+		
+		}
+	}*/
+
+
 
 	for(int i = 0; i < 18; i++)
 	{
@@ -78,17 +212,69 @@ void Map::genSpecMap(char type)
 			if(i != 8 && i != 9)
 			{
 				wall.type = 'W';
+				pieces.push_back(wall);
+				wall.xpos = j*1700;
+				wall.ypos = i*100;
+				pieces.push_back(wall);
 			}
 			else
 			{
-				wall.type = 'D';
+				if(j == 0)
+				{
+					if(count(around.begin(), around.end(), 'U'))
+					{
+						wall.type = 'D';
+						pieces.push_back(wall);
+					}
+					else
+					{
+						wall.type = 'W';
+						pieces.push_back(wall);
+					}
+					if(count(around.begin(), around.end(), 'L'))
+					{
+						wall.type = 'D';
+						wall.xpos = j*1700;
+						wall.ypos = i*100;
+						pieces.push_back(wall);
+					}
+					else
+					{
+						wall.type = 'W';
+						wall.xpos = j*1700;
+						wall.ypos = i*100;
+						pieces.push_back(wall);
+					}
+				}
+				else
+				{
+					if(count(around.begin(), around.end(), 'D'))
+					{
+						wall.type = 'D';
+						pieces.push_back(wall);
+					}
+					else
+					{
+						wall.type = 'W';
+						pieces.push_back(wall);
+					}
+					if(count(around.begin(), around.end(), 'R'))
+					{
+						wall.type = 'D';
+						wall.xpos = j*1700;
+						wall.ypos = i*100;
+						pieces.push_back(wall);
+					}
+					else
+					{
+						wall.type = 'W';
+						wall.xpos = j*1700;
+						wall.ypos = i*100;
+						pieces.push_back(wall);
+					}
+	
+				}
 			}
-			pieces.push_back(wall);
-			wall.xpos = j*1700;
-			wall.ypos = i*100;
-			pieces.push_back(wall);
-			
-			
 		}
 	}
 
@@ -124,8 +310,8 @@ void Map::genSpecMap(char type)
 						int g      = rand() % 255;
 						int b      = rand() % 255;
 
-						curslime.xpos      = 100 + i*1560;
-						curslime.ypos      = 100 + j*1560;
+						curslime.xpos      = 800 + i*100;
+						curslime.ypos      = 800 + j*11;
 						curslime.curRadius = radius;
 						curslime.init_size = radius;
 						curslime.r         = r;
@@ -139,27 +325,25 @@ void Map::genSpecMap(char type)
 				}
 
 				// Add tanks
-				for(int i = 0; i < 3; i++)
+				for(int i = 0; i < 2; i++)
 				{
-					for(int j = 0; j <3; j++)
+					for(int j = 0; j <2; j++)
 					{
-						if(i != j)
-						{
-							tankEnemy curTank;
-							int radius = rand() % 20 + 40;
-							int xpos   = 100 + i * 780;
-							int ypos   = 100 + j * 780;
-							int colour = rand() % 255;
+						
+						tankEnemy curTank;
+						int radius = rand() % 20 + 40;
+						int xpos   = 150 + i * 1460;
+						int ypos   = 150 + j * 1460;
+						int colour = rand() % 255;
 
-							curTank.curRadius = radius;
-							curTank.xpos      = xpos;
-							curTank.ypos      = ypos;
-							curTank.r         = colour;
-							curTank.g         = colour;
-							curTank.b         = colour;
-				
-							TankEnemies.push_back(curTank);
-						}
+						curTank.curRadius = radius;
+						curTank.xpos      = xpos;
+						curTank.ypos      = ypos;
+						curTank.r         = colour;
+						curTank.g         = colour;
+						curTank.b         = colour;
+			
+						TankEnemies.push_back(curTank);
 					}
 				}
 			}				

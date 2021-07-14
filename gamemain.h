@@ -319,25 +319,21 @@ void playGameThread()
 		if(curx > 1701)
 		{
 			whatToDo = 'R';
-			cout << "right\n";
 			runningScreen = false;
 		}
 		if(curx < 59)
 		{
 			whatToDo = 'L';
-			cout << "left\n";
 			runningScreen = false;
 		}
 		if(cury > 1701)
 		{
 			whatToDo = 'D';
-			cout << "down\n";
 			runningScreen = false;
 		}
 		if(cury < 59)
 		{
 			whatToDo = 'U';
-			cout << "up\n";
 			runningScreen = false;
 		}
 
@@ -422,7 +418,7 @@ void GameScreen(sf::RenderWindow* window)
 	
 	initInventory();
 	generateFloor();
-	FirstGun.setGun(500, 50, 150, 'R', 12, 0);
+	FirstGun.setGun(500, 2, 150, 'R', 12, 0);
 	FirstGun.rarity = 'R';	
 	sf::Thread thread(&playGameThread);
 	thread.launch();
@@ -576,20 +572,42 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 	minimap1.setOutlineThickness(2);
 	window->draw(minimap1);
 	int discRooms = Floor.size();
+	int curMapX;
+	int curMapY;
 	for(int i = 0; i < discRooms; i++)
 	{
 		Map curRoom = Floor[i];
-		sf::RectangleShape room(sf::Vector2f(48.f, 48.f));
-		sf::Color sideRoom  {130, 130, 130};
 		if(curRoom.currentRoom)
 		{
-			sideRoom = {200, 200, 200};
+			curMapX = curRoom.xpos;
+			curMapY = curRoom.ypos;
+			break;
 		}
-		room.setPosition(1500+50*curRoom.xpos, 250+50*curRoom.ypos);
-		room.setFillColor(sideRoom);
-		room.setOutlineColor(white);
-		room.setOutlineThickness(2);
-		window->draw(room);
+	}
+	for(int i = 0; i < discRooms; i++)
+	{
+		Map curRoom = Floor[i];
+		int xdistance = abs(curMapX - curRoom.xpos);
+		int ydistance = abs(curMapY - curRoom.ypos);
+		
+		if(xdistance < 3 && ydistance < 3)
+		{
+			sf::RectangleShape room(sf::Vector2f(48.f, 48.f));
+			sf::Color sideRoom  {80, 80, 80};
+			if(curRoom.currentRoom)
+			{
+				sideRoom = {200, 200, 200};
+			}
+			else if(curRoom.cleared)
+			{
+				sideRoom = {150, 150, 150};
+			}
+			room.setPosition(1500+50*(curRoom.xpos-curMapX), 250+50*(curRoom.ypos-curMapY));
+			room.setFillColor(sideRoom);
+			room.setOutlineColor(white);
+			room.setOutlineThickness(2);
+			window->draw(room);
+		}
 	}
 	//Display screen
 	window->display();
