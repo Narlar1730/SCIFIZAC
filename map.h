@@ -79,7 +79,6 @@ vector<char> Map::getSurroundingRooms()
 		}
 	}
 
-	int numOut = out.size();
 	return out;
 }
 
@@ -107,6 +106,7 @@ int numRoomsWithFreeSlots()
 
 void generateFloor()
 {
+	Floor.clear();
 	int NumRooms = 6+(rand()%5+1);
 	Map initRoom;
 	initRoom.xpos = 0;
@@ -189,19 +189,7 @@ void generateFloor()
 void Map::genSpecMap(char type)
 {
 	vector<char> around = getSurroundingRooms();
-
-	int numRoomsAround = around.size();
-	/*for(int i = 0; i < 4; i++)
-	{
-		char current = around[i];
-		if(current == 'R')
-		{
-		
-		}
-	}*/
-
-
-
+	
 	for(int i = 0; i < 18; i++)
 	{
 		for(int j = 0; j < 2; j++)

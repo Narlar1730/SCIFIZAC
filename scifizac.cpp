@@ -74,6 +74,8 @@ void openingScreen(sf::RenderWindow* window)
 			statsScreen(window);
 			break;
 		case 'p' :
+			runningScreen = true;
+			runningGame   = true;
 			GameScreen(window);
 			//runningScreen = true;
 			gameOverScreen(window);

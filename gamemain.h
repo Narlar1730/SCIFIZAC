@@ -405,6 +405,10 @@ void playGameThread()
 		}
 		loadNextRoom();
 	}
+	else
+	{
+		runningGame = false;
+	}
 
 }
 
