@@ -1,6 +1,7 @@
 /*Master list codex:
  E: empty
  W: weapon
+ P: peeet
 */
 vector<char> masterlist;
 vector<weapon> weaponInventory;
@@ -14,7 +15,7 @@ void removeItem(int);
 
 void printItems()
 {
-	for(int i = 0; i < 24; i++)
+	for(int i = 0; i < 37; i++)
 	{
 		if(i < 10)
 		{
@@ -44,7 +45,7 @@ weapon getItem(int index)
 void initInventory()
 {
 	weaponInventory = {};
-	for(int i = 0; i < 24; i++)
+	for(int i = 0; i < 37; i++)
 	{
 		weapon newItem;
 		newItem.itemType = 'E';

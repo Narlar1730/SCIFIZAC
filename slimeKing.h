@@ -3,7 +3,7 @@
  * 
  * We have the class, slime Enemy, and the vector, SlimeList which contains all the slimes
  */
-/*class SlimeEnemy {
+/*class SlimeKing {
 	public:
 		int xpos, ypos, curRadius, init_size, r, g, b;
 		int hitCounter = 0;
@@ -17,7 +17,7 @@
 		void moveSlime();
 };
 
-class DeadSlime {
+class DeadKingSlime {
 	public:
 	        int xpos, ypos, radius, lifeSpan;
 	        void spawnDead(int, int, int, int);
@@ -25,10 +25,10 @@ class DeadSlime {
 		void drawDead(sf::RenderWindow*);	       
 };*/
 
-vector<SlimeEnemy> SlimeList;
-vector<DeadSlime> DeadList;
+vector<SlimeKing> SlimeKingList;
+vector<DeadKingSlime> DeadKingList;
 
-void DeadSlime::drawDead(sf::RenderWindow* window)
+void DeadKingSlime::drawDead(sf::RenderWindow* window)
 {
 	int xcent = xpos + radius;
 	int ycent = ypos + radius;
@@ -43,12 +43,12 @@ void DeadSlime::drawDead(sf::RenderWindow* window)
 	}
 }
 
-void DeadSlime::updateDead()
+void DeadKingSlime::updateDead()
 {
 	lifeSpan = lifeSpan - 1;
 }
 
-void DeadSlime::spawnDead(int x, int y, int rad, int life)
+void DeadKingSlime::spawnDead(int x, int y, int rad, int life)
 {
 	xpos = x;
 	ypos = y;
@@ -56,7 +56,7 @@ void DeadSlime::spawnDead(int x, int y, int rad, int life)
 	lifeSpan = life;
 }
 
-bool SlimeEnemy::hurtSlime(int damage)
+bool SlimeKing::hurtSlime(int damage)
 {
 	bool Alive = true;
 	//Maybe implement crits?
@@ -65,9 +65,9 @@ bool SlimeEnemy::hurtSlime(int damage)
 	if(health < 0)
 	{
 		Alive = false;
-		DeadSlime newSlime;
+		DeadKingSlime newSlime;
 		newSlime.spawnDead(xpos, ypos, curRadius, 20);
-		DeadList.push_back(newSlime);
+		DeadKingList.push_back(newSlime);
 	}
 
 	hitCounter = 50;
@@ -75,7 +75,7 @@ bool SlimeEnemy::hurtSlime(int damage)
 	return Alive;
 }
 
-void SlimeEnemy::spawnSlime()
+void SlimeKing::spawnSlime()
 {
 	int xSlime = rand() % 1800;
 	int ySlime = rand() % 1800;
@@ -97,12 +97,12 @@ void SlimeEnemy::spawnSlime()
 		ySlime = 1820;
 	}
 
-	SlimeEnemy::spawnSlime(xSlime, ySlime);
+	SlimeKing::spawnSlime(xSlime, ySlime);
 
 
 }
 
-void SlimeEnemy::spawnSlime(int x, int y)
+void SlimeKing::spawnSlime(int x, int y)
 {
 	r = rand() % 255;
 	g = rand() % 255;
@@ -117,7 +117,7 @@ void SlimeEnemy::spawnSlime(int x, int y)
 	hitCounter = 0;
 }
 
-void SlimeEnemy::moveSlime()
+void SlimeKing::moveSlime()
 {
 	int xDir = mainChar.xpos;
 	int yDir = mainChar.ypos;
@@ -128,8 +128,8 @@ void SlimeEnemy::moveSlime()
 	
 	theta = atan((static_cast<double>(ypos) - static_cast<double>(yDir))/(static_cast<double>(xpos) - static_cast<double>(xDir)));
 
-	if(hitCounter == 0 && gameclock % 4 == 0)
-	{	
+	if(gameclock%4==0)
+	{
 		int yVelo = abs(static_cast<int>(3*sin(theta)));
 		int xVelo = abs(static_cast<int>(3*cos(theta)));
 		if(xDir > xpos) 
@@ -149,52 +149,6 @@ void SlimeEnemy::moveSlime()
 			ypos -= yVelo;
 		}
 	}
-	else if(gameclock % 4 == 0)
-	{
-		int yVelo = abs(static_cast<int>(3*sin(theta)));
-		int xVelo = abs(static_cast<int>(3*cos(theta)));
-		if(xDir > xpos) 
-		{
-			xpos -= 2*xVelo;
-		}
-		else if(xDir < xpos)
-		{
-			xpos += 2*xVelo;
-		}
-		if(yDir > ypos)
-		{
-			ypos -= 2*yVelo;
-		}
-		else if(yDir < 2*ypos)
-		{
-			ypos += 2*yVelo;
-		}
-		hitCounter -= 2;
-
-	}
-
-	/*else
-	{
-		if(xDir > xpos)
-		{
-			xpos -= 1;
-		}
-		else
-		{
-			xpos += 1;
-		}
-		if(yDir > ypos)
-		{
-			ypos -= 1;
-		}
-		else
-		{
-			ypos += 1;
-		}
-		hitCounter -= 1;
-	}*/
-
-
 	//Change size
 	if(gameclock % 15 == 0)
 	{
@@ -299,7 +253,7 @@ void SlimeEnemy::moveSlime()
 	
 }
 
-void SlimeEnemy::drawSlime(sf::RenderWindow* window)
+void SlimeKing::drawSlime(sf::RenderWindow* window)
 {
 	sf::CircleShape slime;
 	slime.setRadius(curRadius);
@@ -341,5 +295,17 @@ void SlimeEnemy::drawSlime(sf::RenderWindow* window)
 	slime.setOutlineThickness(4);
 	slime.setPosition(xpos, ypos);
 	window->draw(slime);
+
+	float healthBarWidth = (static_cast<float>(health) / 10000) * 400.f;
+
+	sf::RectangleShape healthBak(sf::Vector2f(404.f, 8.f));
+	sf::RectangleShape healthBar(sf::Vector2f(healthBarWidth, 4.f));
+	healthBak.setPosition(xpos, ypos+420);
+	healthBar.setPosition(xpos+2, ypos+422);
+	healthBak.setFillColor(sf::Color(20, 20, 20));
+	healthBar.setFillColor(sf::Color(255, 0 , 0));
+	
+	window->draw(healthBak);
+	window->draw(healthBar);
 
 }

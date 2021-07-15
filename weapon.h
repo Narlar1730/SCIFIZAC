@@ -8,10 +8,13 @@
 
 using namespace std;
 
+//Declare Functions
+
 class projectile {
 	public: 
 		int xSpeed, ySpeed, xpos, ypos, radius, life, maxSpeed, colour;
 		void spawnProjectile(int, int, int, int, int, int);
+		void spawnStationaryProjectile(int, int, int, int, int, int);
 		void drawProjectile(sf::RenderWindow*);
 		void addSpeed(int, int);
 		bool moveProjectile();
@@ -417,6 +420,18 @@ void weapon::drawItem(sf::RenderWindow* window)
 			UnderGlow = UnderGlow + additive;
 		}
 	}
+
+
+	// I don't like this, it will need to be refactored fix it later
+	if(itemType == 'P')
+	{
+		if(style == 'S')
+		{
+			drawSlimePet(window);
+			return;
+		}
+	}
+
 
 	//Here we draw the weapons
 	switch(style)
@@ -862,6 +877,41 @@ vector<int> velocityFix(int x, int y, int maxVel)
 	out.push_back(static_cast<int>(o));
 	return out;
 }
+
+void projectile::spawnStationaryProjectile(int xPos, int yPos, int xVel, int yVel, int radii, int lifespan)
+{
+	Alive = true;
+	if(xVel > 0 && xVel < 3)
+	{
+		xVel = 3;
+	}
+	else if(xVel < 0 && xVel > -3)
+	{
+		xVel = -3;
+	}
+	if(yVel > 0 && yVel < 3)
+	{
+		yVel = 3;
+	}
+	else if(yVel <0 && yVel > -3)
+	{
+		yVel = -3;
+	}
+
+	maxSpeed = 3;
+	colour = -1;
+	vector<int> vels = velocityFix(xVel, yVel, maxSpeed);
+	xVel = vels[0];
+	yVel = vels[1];
+
+	xpos = xPos+20;
+	ypos = yPos+20;
+	xSpeed = xVel;
+	ySpeed = yVel;
+	life = lifespan;
+	radius = radii;
+}
+
 
 void projectile::spawnProjectile(int xPos, int yPos, int xVel, int yVel, int radii, int lifespan)
 {

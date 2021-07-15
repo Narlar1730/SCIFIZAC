@@ -1,10 +1,10 @@
-class obstacle{
+/*class obstacle{
 	public:
 		int xpos, ypos;
 		char type;
 		void drawObstacle(sf::RenderWindow* window);
 		void drawObstacle(sf::RenderWindow* window, sf::Color, sf::Color, sf::Color);
-};
+};*/
 
 vector<obstacle> mapPiece;
 

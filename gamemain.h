@@ -10,6 +10,7 @@
 #include <sstream>
 #include <math.h>
 #include <time.h>
+#include "declarations.h"
 #include "obstacles.h"
 #include "player.h"
 //#include "slimeEnemy.h"
@@ -17,19 +18,20 @@ using namespace std;
 //Handle interface running
 bool runningScreen = true;
 bool runningGame = true;
-
+Map curMap;
 int gameclock = 1;
 Player mainChar;
 int buttonClickTimer = 0;
 #include "weapon.h"
+#include "slimepet.h"
 #include "inventory.h"
 #include "pausescreen.h"
 #include "slimeEnemy.h"
 #include "tankEnemy.h"
+#include "slimeKing.h"
 #include "Gameoverscreen.h"
 #include "map.h"
 
-Map curMap;
 
 char DrawGameScreen(int, int, bool, bool, Player, sf::RenderWindow*);
 void playGameThread();
@@ -89,13 +91,24 @@ void playGameThread()
 			{
 				SlimeList.clear();
 				TankList.clear();
+				SlimeKingList.clear();
+
 			}
 			else
 			{
 				SlimeList = curMap.SlimeEnemies;
 				TankList = curMap.TankEnemies;
+				SlimeKingList = curMap.KingEnemies;
 			}
 		}
+	}
+
+	if(inventory[36].itemType == 'P')
+	{
+		weapon curWep = inventory[36];
+		curWep.xpos = mainChar.xpos - 50;
+		curWep.ypos = mainChar.ypos - 50;
+		inventory[36] = curWep;
 	}
 	//FirstGun.setGun(500, 50, 150, 'R', 12, 0);
 	//FirstGun.rarity = 'R';
@@ -137,6 +150,7 @@ void playGameThread()
 		int NumProjectiles = AllProjectiles.size();
 		vector<projectile> newVec{};
 		vector<SlimeEnemy> slimeVec{};
+		vector<SlimeKing>  slimeKingVec{};
 		vector<tankEnemy> tankVec{};
 		vector<DeadTank> deadTanks{};
 		vector<DeadSlime> deadVec{};
@@ -194,6 +208,52 @@ void playGameThread()
 			}
 		}
 
+		// Update Slime Kings
+		int numKings = SlimeKingList.size();
+		for(int i = 0; i < numKings; i++)
+		{
+			SlimeKingList[i].moveSlime();
+			SlimeKing CurKing = SlimeKingList[i];
+			int slimeR = CurKing.curRadius;
+			int slimeX = CurKing.xpos;
+			int slimeY = CurKing.ypos;
+			for(int j = 0; j < NumProjectiles; j++)
+			{
+				//FIXME
+				int Pradi = AllProjectiles[j].radius;
+				int Pxpos = AllProjectiles[j].xpos + Pradi;
+				int Pypos = AllProjectiles[j].ypos + Pradi;
+
+				if(circleIntercept(slimeX, slimeY, slimeR, Pxpos, Pypos, Pradi))
+				{
+					SlimeKingList[i].hurtSlime(FirstGun.damage);
+					AllProjectiles[j].Alive = false;
+				}
+			}
+			if(circleIntercept(slimeX, slimeY, slimeR, mainChar.xpos, mainChar.ypos, 40))
+			{
+				mainChar.hurtPlayer(1);
+			}
+			if(SlimeKingList[i].health > 0)
+			{
+				slimeKingVec.push_back(SlimeKingList[i]);
+			}
+			else
+			{
+				int DropChance = 10;
+				int roll100 = rand() % 100;
+				weapon SlimePet = initSlimePet();
+				SlimePet.xpos = slimeX;
+				SlimePet.ypos = slimeY;
+				GroundWeapons.push_back(SlimePet);
+				if(roll100 < DropChance)
+				{
+					spawnRandomGun(slimeX, slimeY);
+				}
+			}
+	
+		}
+		SlimeKingList = slimeKingVec;
 		SlimeList = slimeVec;
 		// Update Tanks
 		int numTanks = TankList.size();
@@ -312,6 +372,17 @@ void playGameThread()
 		DeadTanks = deadTanks;
 		AllProjectiles = newVec;
 		enemyShots = newEnemyShots;
+
+		//Update Pets
+		if(inventory[36].itemType == 'P')
+		{
+			weapon CurPet = inventory[36];
+			if(CurPet.style == 'S')
+			{
+				CurPet.moveSlimePet();
+				inventory[36] = CurPet;
+			}
+		}
 	
 		//Check if moving onto nextRoom;
 		int curx = mainChar.xpos;
@@ -424,6 +495,12 @@ void GameScreen(sf::RenderWindow* window)
 	generateFloor();
 	FirstGun.setGun(500, 2, 150, 'R', 12, 0);
 	FirstGun.rarity = 'R';	
+	insertWeapon(FirstGun, 24);
+	weapon SlimePet = initSlimePet();
+	SlimePet.extra = 0;
+	insertWeapon(SlimePet, 36);
+	
+
 	sf::Thread thread(&playGameThread);
 	thread.launch();
 	//This loop updates the screen and draws the picture.
@@ -533,6 +610,14 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		mapPiece[i].drawObstacle(window);
 	}
 
+	//Draw kingSlime
+	int numKings = SlimeKingList.size();
+	for(int i = 0; i < numKings; i++)
+	{
+		SlimeKingList[i].drawSlime(window);
+	}
+
+
 	//Draw outline and inline?
 	sf::RectangleShape flatLine(sf::Vector2f(1800.f, 2.f));
 	flatLine.setPosition(0, 0);
@@ -560,14 +645,19 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 	smallLine.setPosition(1700, 100);
 	window->draw(smallLine);
 
+	//Draw Pets
+	if(inventory[36].itemType == 'P')
+	{
+		weapon CurPet = inventory[36];
+		if(CurPet.style == 'S')
+		{
+			CurPet.drawSlimePet(window);
+		}
+	}
+
 	//Draw Player
 	mainChar.drawPlayer(window);
 	
-	if(pauseScreen)
-	{
-		pauseScreen = drawPauseScreen(mousex, mousey, MouseReleased, MouseDown, window);
-	}
-
 	//Draw Minimap
 	sf::RectangleShape minimap1(sf::Vector2f(250.f, 250.f));
 	minimap1.setPosition(1400, 150);
@@ -613,6 +703,12 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 			window->draw(room);
 		}
 	}
+
+	if(pauseScreen)
+	{
+		pauseScreen = drawPauseScreen(mousex, mousey, MouseReleased, MouseDown, window);
+	}
+
 	//Display screen
 	window->display();
 	window->clear();

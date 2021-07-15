@@ -1,7 +1,8 @@
-class Map{
+/*class Map{
 	public:
 		vector<SlimeEnemy> SlimeEnemies;
 		vector<tankEnemy>  TankEnemies;
+		vector<SlimeKing>  KingEnemies;
 		vector<obstacle>   pieces;
 		sf::Color          background;
 		sf::Color          complement;
@@ -16,7 +17,7 @@ class Map{
 		void               genRandMap();        // Generate Random Map
 		void		   genSpecMap(char type);
 		void		   openDoors();
-};
+};*/
 
 vector<Map> Floor;
 
@@ -163,7 +164,44 @@ void generateFloor()
 		}
 		Floor.push_back(curRoom);
 	}
+
+	//Generate boss room
+	Map bossRoom;
+	int numCurRooms = numRoomsWithFreeSlots();
+	int whichRoom = rand() % numCurRooms;
+	Map freeRoom = freeSlotRooms[whichRoom];
+	vector<char> availableRooms = freeRoom.getFreeSurroundingRooms();
+	int numFree = rand() % availableRooms.size();
+	char direction = availableRooms[numFree];
+	switch(direction)
+	{
+		case 'U':
+			bossRoom.xpos = freeRoom.xpos;
+			bossRoom.ypos = freeRoom.ypos-1;
+			break;
+		case 'D':
+			bossRoom.xpos = freeRoom.xpos;
+			bossRoom.ypos = freeRoom.ypos+1;
+			break;
+		case 'L':
+			bossRoom.xpos = freeRoom.xpos+1;
+			bossRoom.ypos = freeRoom.ypos;
+			break;
+		case 'R':
+			bossRoom.xpos = freeRoom.xpos-1;
+			bossRoom.ypos = freeRoom.ypos;
+			break;
+	}
+
+	//Boss room generation
+	bossRoom.genSpecMap('B');
+	bossRoom.discovered = true;
+	bossRoom.generated  = true;
+	// Add boss room in
+	Floor.push_back(bossRoom);
 	
+
+	//Generate rooms
 	int madeRooms = Floor.size();
 	for(int i = 0; i < madeRooms; i ++)
 	{
@@ -175,7 +213,7 @@ void generateFloor()
 			curRoom.generated  = true;
 			Floor[i] = curRoom;
 		}
-		else
+		else if(curRoom.currentRoom)
 		{
 			curRoom.genSpecMap('O');
 			curRoom.discovered = true;
@@ -271,6 +309,27 @@ void Map::genSpecMap(char type)
 	{
 		case 'O':
 			{
+				break;
+			}
+		case 'B':
+			{
+			//	cout << "Spawned King Room\n";
+				SlimeKing kingSlime;
+				int radius       = 200;
+				int r            = rand() % 255;
+				int g            = rand() % 255;
+				int b            = rand() % 255;
+
+				kingSlime.xpos = 860;
+				kingSlime.ypos = 800;
+				kingSlime.curRadius = radius;
+				kingSlime.init_size = radius;
+				kingSlime.r         = r;
+				kingSlime.g         = g;
+				kingSlime.b         = b;
+				kingSlime.health    = 10000;
+
+				KingEnemies.push_back(kingSlime);
 				break;
 			}
 		case 'R':

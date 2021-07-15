@@ -5,7 +5,7 @@
 		void drawItem(sf::RenderWindow* window);
 		void drawStats(int, int, sf::RenderWindow* window);
 		string name;
-};*/
+};
 
 class weapon{
 	public:
@@ -20,9 +20,12 @@ class weapon{
 		void drawGroundWeapon(sf::RenderWindow*);
 		void setGun(int, int, int, char, int, int);
 		void drawStats(int, int, sf::RenderWindow*);
+		//Change this to something else?
+		void drawSlimePet(sf::RenderWindow*);
+		void moveSlimePet();
 };
 
-/*class emptyItem: public Item{
+class emptyItem: public Item{
 
 	public:
 		void drawItem(sf::RenderWindow* window);

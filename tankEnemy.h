@@ -3,7 +3,7 @@
  * 
  * We have the class, tank Enemy, and the vector, tankList which contains all the tanks
  */
-class tankEnemy {
+/*class tankEnemy {
 	public:
 		int xpos, ypos, curRadius, init_size, r, g, b;
 		int hitCounter = 0;
@@ -27,7 +27,7 @@ class DeadTank {
 	        void spawnDead(int, int, int, int);
 		void updateDead();
 		void drawDead(sf::RenderWindow*);	       
-};
+};*/
 
 class enemyProjectile {
 	public:
