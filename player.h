@@ -17,7 +17,7 @@ class Player {
 		void setInitValues(int, int);
 		void drawPlayer(sf::RenderWindow*);
 		bool MoveCharacter();
-		vector<weapon> weaponInventory;
+		weapon EquippedGun;
 };
 
 void Player::hurtPlayer(int hurt)
@@ -76,7 +76,12 @@ void Player::drawPlayer(sf::RenderWindow* window)
 
 	//Draw gun
 	//Gun doesn't point the way I like. Will come back to this later
+	//
+	EquippedGun.xpos = xpos;
+	EquippedGun.ypos = ypos;
+	EquippedGun.drawHeldWeapon(window);
 	//FIXME
+	/*
 	bool DrawGun = false;
 	vector<int> angles = {};
 	int arrowsPressed = 0;
@@ -125,7 +130,7 @@ void Player::drawPlayer(sf::RenderWindow* window)
 		gun.setRotation(angle);
 		window->draw(gun);
 	}
-
+	*/
 	//Draw healthbar.
 	sf::RectangleShape backBar(sf::Vector2f(1500.f, 20.f));
 	backBar.setPosition(150, 1650);

@@ -3,27 +3,6 @@
  * 
  * We have the class, slime Enemy, and the vector, SlimeList which contains all the slimes
  */
-/*class SlimeKing {
-	public:
-		int xpos, ypos, curRadius, init_size, r, g, b;
-		int hitCounter = 0;
-		int health = init_size*10;
-		int speed = 10;
-		bool growing;
-		void spawnSlime();
-		bool hurtSlime(int);
-		void spawnSlime(int, int);
-		void drawSlime(sf::RenderWindow*);
-		void moveSlime();
-};
-
-class DeadKingSlime {
-	public:
-	        int xpos, ypos, radius, lifeSpan;
-	        void spawnDead(int, int, int, int);
-		void updateDead();
-		void drawDead(sf::RenderWindow*);	       
-};*/
 
 vector<SlimeKing> SlimeKingList;
 vector<DeadKingSlime> DeadKingList;
@@ -128,7 +107,38 @@ void SlimeKing::moveSlime()
 	
 	theta = atan((static_cast<double>(ypos) - static_cast<double>(yDir))/(static_cast<double>(xpos) - static_cast<double>(xDir)));
 
-	if(gameclock%4==0)
+	if(attackCounter <= 0)
+	{
+		attackCounter = 1000;
+	}
+	
+	if(attackCounter == 1)
+	{
+		for(int i = 0; i <2; i++)
+		{
+			for(int j = 0; j<2; j++)
+			{
+				SlimeEnemy slime;
+				slime.spawnSlime(xpos-10+2*curRadius*i, ypos-10+2*curRadius*j);
+				SlimeList.push_back(slime);
+			}
+		}
+
+		for(int i = 0; i <2; i++)
+		{
+			for(int j = 0; j<2; j++)
+			{
+				SlimeEnemy slime;
+				slime.spawnSlime(xpos+curRadius-10+curRadius*2*i, ypos+curRadius+10+curRadius*2*i);
+				SlimeList.push_back(slime);
+			}
+		}
+	}
+	else if(attackCounter < 100)
+	{
+	
+	}
+	else if(gameclock%4==0)
 	{
 		int yVelo = abs(static_cast<int>(3*sin(theta)));
 		int xVelo = abs(static_cast<int>(3*cos(theta)));
@@ -149,6 +159,8 @@ void SlimeKing::moveSlime()
 			ypos -= yVelo;
 		}
 	}
+
+	attackCounter -= 1;
 	//Change size
 	if(gameclock % 15 == 0)
 	{
@@ -256,10 +268,12 @@ void SlimeKing::moveSlime()
 void SlimeKing::drawSlime(sf::RenderWindow* window)
 {
 	sf::CircleShape slime;
+	sf::Color black {0, 0, 0};
+
 	slime.setRadius(curRadius);
-	int rHurt = r+hitCounter;
-	int gHurt = g-hitCounter;
-	int bHurt = b-hitCounter;
+	int rHurt = r+2*hitCounter;
+	int gHurt = g-2*hitCounter;
+	int bHurt = b-2*hitCounter;
 	if(gHurt < 0)
 	{
 		gHurt = 0;
@@ -273,7 +287,9 @@ void SlimeKing::drawSlime(sf::RenderWindow* window)
 	{
 		rHurt = 255;	
 	}
-	slime.setFillColor(sf::Color(rHurt, gHurt, bHurt));
+
+	sf::Color curColour = sf::Color(rHurt, gHurt, bHurt);
+	slime.setFillColor(curColour);
 	
 	int rO = r + 20;
 	int gO = g + 20;
@@ -295,7 +311,33 @@ void SlimeKing::drawSlime(sf::RenderWindow* window)
 	slime.setOutlineThickness(4);
 	slime.setPosition(xpos, ypos);
 	window->draw(slime);
+	if(attackCounter < 100)
+	{
+		sf::RectangleShape eye1(sf::Vector2f(20.f, 6.f));
+		eye1.setPosition(xpos+80, ypos+80);
+		eye1.setFillColor(black);
+		window->draw(eye1);
 
+		sf::RectangleShape eye2(sf::Vector2f(20.f, 6.f));
+		eye2.setPosition(xpos+240, ypos+80);
+		eye2.setFillColor(black);
+		window->draw(eye2);
+	}
+	else
+	{			
+		sf::CircleShape eye1;
+		eye1.setRadius(15);
+		eye1.setFillColor(sf::Color(0, 0, 0));
+		//eye1.setFillColor(curColour - sf::Color(50, 50, 50));
+		eye1.setPosition(xpos+80, ypos+80);
+		window->draw(eye1);
+
+		sf::CircleShape eye2;
+		eye2.setRadius(15);
+		eye2.setFillColor(sf::Color(0, 0, 0));
+		eye2.setPosition(xpos+240, ypos+80);
+		window->draw(eye2);
+	}
 	float healthBarWidth = (static_cast<float>(health) / 10000) * 400.f;
 
 	sf::RectangleShape healthBak(sf::Vector2f(404.f, 8.f));

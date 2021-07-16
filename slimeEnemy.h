@@ -3,28 +3,6 @@
  * 
  * We have the class, slime Enemy, and the vector, SlimeList which contains all the slimes
  */
-/*class SlimeEnemy {
-	public:
-		int xpos, ypos, curRadius, init_size, r, g, b;
-		int hitCounter = 0;
-		int health = init_size*10;
-		int speed = 10;
-		bool growing;
-		void spawnSlime();
-		bool hurtSlime(int);
-		void spawnSlime(int, int);
-		void drawSlime(sf::RenderWindow*);
-		void moveSlime();
-};
-
-class DeadSlime {
-	public:
-	        int xpos, ypos, radius, lifeSpan;
-	        void spawnDead(int, int, int, int);
-		void updateDead();
-		void drawDead(sf::RenderWindow*);	       
-};*/
-
 vector<SlimeEnemy> SlimeList;
 vector<DeadSlime> DeadList;
 

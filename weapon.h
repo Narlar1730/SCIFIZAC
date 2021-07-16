@@ -367,6 +367,406 @@ void weapon::drawGroundWeapon(sf::RenderWindow* window)
 	drawItem(window);
 }
 
+
+void weapon::drawLaser(sf::RenderWindow* window)
+{
+	sf::Color GunGrey  	{100, 100, 100};
+	sf::Color bandGrey 	{ 80,  80,  80};
+	sf::Color black    	{  0,   0,   0};
+	sf::Color handleBrown   { 87,  65,  47};
+	sf::Color white         {255, 255, 255};
+	
+	int xOffset = 30;
+	int yOffset = 30;
+
+
+	if(RIGHTpressed)
+	{
+		xOffset +=15;
+		sf::RectangleShape laser(sf::Vector2f(60.f, 8.f));
+		sf::Color LaserColor = colourSelectorNoOpaque((intToRar(extra % 7)));
+		laser.setPosition(xpos+xOffset+5, ypos+yOffset+2-10);
+		laser.setFillColor(LaserColor);
+		window->draw(laser);
+		
+
+		sf::RectangleShape barrel(sf::Vector2f(60.f, 12.f));
+		barrel.setPosition(xpos+xOffset, ypos+yOffset-10);
+		barrel.setFillColor(black);
+		window->draw(barrel);
+
+	}
+	else if(LEFTpressed)
+	{
+		xOffset += 10;
+		sf::RectangleShape laser(sf::Vector2f(60.f, 8.f));
+		laser.setPosition(xpos+xOffset+5-75, ypos+yOffset+2-10);
+		sf::Color LaserColor = colourSelectorNoOpaque((intToRar(extra % 7)));
+		laser.setFillColor(LaserColor);
+		window->draw(laser);
+		
+
+		sf::RectangleShape barrel(sf::Vector2f(60.f, 12.f));
+		barrel.setPosition(xpos+xOffset-60, ypos+yOffset-10);
+		barrel.setFillColor(black);
+		window->draw(barrel);
+
+	}
+	else if(UPpressed)
+	{
+		sf::RectangleShape laser(sf::Vector2f(8.f, 60.f));
+		sf::Color LaserColor = colourSelectorNoOpaque((intToRar(extra % 7)));
+		laser.setFillColor(LaserColor);
+		laser.setPosition(xpos+xOffset+2-10, ypos+yOffset-70);
+		window->draw(laser);
+
+		sf::RectangleShape barrel(sf::Vector2f(12.f, 60.f));
+		barrel.setPosition(xpos+xOffset-10, ypos-yOffset);
+		barrel.setFillColor(black);
+		window->draw(barrel);
+	}
+	else if(DOWNpressed)
+	{
+		sf::RectangleShape laser(sf::Vector2f(8.f, 60.f));
+		sf::Color LaserColor = colourSelectorNoOpaque((intToRar(extra % 7)));
+		laser.setFillColor(LaserColor);
+		laser.setPosition(xpos+xOffset-10, ypos+yOffset+25);
+		window->draw(laser);
+
+		sf::RectangleShape barrel(sf::Vector2f(12.f, 60.f));
+		barrel.setFillColor(black);
+		barrel.setPosition(xpos+xOffset-10, ypos+yOffset+15);
+		window->draw(barrel);
+	}
+
+}	
+
+void weapon::drawMiniGun(sf::RenderWindow* window)
+{
+	sf::Color GunGrey  	{100, 100, 100};
+	sf::Color bandGrey 	{ 80,  80,  80};
+	sf::Color black    	{  0,   0,   0};
+	sf::Color handleBrown   { 87,  65,  47};
+	sf::Color white         {255, 255, 255};
+	
+	int xOffset = 30;
+	int yOffset = 30;
+	
+	
+	if(RIGHTpressed)
+	{
+		xOffset += 45;
+		yOffset -= 10;
+		for(int i = 0; i <3; i++)
+		{
+			sf::RectangleShape barrel(sf::Vector2f(60.f, 6.f));
+			barrel.setPosition(xpos+xOffset, ypos+10*i+yOffset);
+			barrel.setFillColor(GunGrey);
+			barrel.setOutlineColor(black);
+			barrel.setOutlineThickness(1);
+			window->draw(barrel);
+		}
+		for(int i = 0; i < 2; i++)
+		{
+			sf::RectangleShape band(sf::Vector2f(4.f, 30.f));
+			band.setPosition(xpos+10+i*35+xOffset, ypos-2+yOffset);
+			band.setFillColor(bandGrey);
+			band.setOutlineColor(black);
+			band.setOutlineThickness(1);
+			window->draw(band);
+		}
+	}
+	else if(LEFTpressed)
+	{
+		xOffset -= 80;
+		yOffset -= 10;
+		for(int i = 0; i <3; i++)
+		{
+			sf::RectangleShape barrel(sf::Vector2f(60.f, 6.f));
+			barrel.setPosition(xpos+xOffset, ypos+10*i+yOffset);
+			barrel.setFillColor(GunGrey);
+			barrel.setOutlineColor(black);
+			barrel.setOutlineThickness(1);
+			window->draw(barrel);
+		}
+		for(int i = 0; i < 2; i++)
+		{
+			sf::RectangleShape band(sf::Vector2f(4.f, 30.f));
+			band.setPosition(xpos+10+i*35+xOffset, ypos-2+yOffset);
+			band.setFillColor(bandGrey);
+			band.setOutlineColor(black);
+			band.setOutlineThickness(1);
+			window->draw(band);
+		}
+
+	}
+	else if(UPpressed)
+	{
+		xOffset -= 10;	
+		for(int i = 0; i <3; i++)
+		{
+			sf::RectangleShape barrel(sf::Vector2f(6.f, 60.f));
+			barrel.setPosition(xpos+xOffset+10*i+2, ypos+yOffset-80);
+			barrel.setFillColor(GunGrey);
+			barrel.setOutlineColor(black);
+			barrel.setOutlineThickness(1);
+			window->draw(barrel);	
+		}
+		for(int i = 0; i < 2; i++)
+		{
+			sf::RectangleShape band(sf::Vector2f(30.f, 4.f));
+			band.setPosition(xpos+xOffset, ypos+yOffset+i*35+10-80);
+			band.setFillColor(bandGrey);
+			band.setOutlineColor(black);
+			band.setOutlineThickness(1);
+			window->draw(band);
+		}
+	}
+	else if(DOWNpressed)
+	{
+		xOffset -= 10;	
+		yOffset += 120;
+		for(int i = 0; i <3; i++)
+		{
+			sf::RectangleShape barrel(sf::Vector2f(6.f, 60.f));
+			barrel.setPosition(xpos+xOffset+10*i+2, ypos+yOffset-80);
+			barrel.setFillColor(GunGrey);
+			barrel.setOutlineColor(black);
+			barrel.setOutlineThickness(1);
+			window->draw(barrel);	
+		}
+		for(int i = 0; i < 2; i++)
+		{
+			sf::RectangleShape band(sf::Vector2f(30.f, 4.f));
+			band.setPosition(xpos+xOffset, ypos+yOffset+i*35+10-80);
+			band.setFillColor(bandGrey);
+			band.setOutlineColor(black);
+			band.setOutlineThickness(1);
+			window->draw(band);
+		}
+
+	}
+	
+}
+
+void weapon::drawRifle(sf::RenderWindow* window)
+{
+	sf::Color GunGrey  	{100, 100, 100};
+	sf::Color bandGrey 	{ 80,  80,  80};
+	sf::Color black    	{  0,   0,   0};
+	sf::Color handleBrown   { 87,  65,  47};
+	sf::Color white         {255, 255, 255};
+	int xOffset = 30;
+	int yOffset = 30;
+	
+	int xScope = 0;
+	int yScope = 0;
+
+	float theta = 0;
+	if(RIGHTpressed && UPpressed)
+	{
+		yOffset -= 13;
+		xScope += 10;
+		yScope -= 10;
+		theta = 315;
+	}
+	else if(RIGHTpressed && DOWNpressed)
+	{
+		xOffset += 35;
+		yOffset += 40;
+		yScope += 10;
+
+		theta = 45;
+	}
+	else if(LEFTpressed && UPpressed)
+	{
+		xOffset -= 10;
+		yOffset -= 10;
+		xScope -= 20;
+		yScope -= 5;
+		theta = 225;
+	}
+	else if(LEFTpressed && DOWNpressed)
+	{
+		xOffset -= 10;
+		xScope -= 30;
+		yOffset += 10;
+		yScope += 30;
+
+		theta = 135;
+	}
+	else if(LEFTpressed)
+	{
+		xOffset -= 20;
+		xScope -= 34;
+		yScope += 10;
+		theta = 180;
+	}
+	else if(UPpressed)
+	{
+		yOffset -= 30;
+		xScope -= 20;
+		theta = 270;
+	}
+	else if(DOWNpressed)
+	{
+		theta = 90;
+		yOffset += 40;
+		xScope -= 10;
+		yScope += 25;
+	}
+	else
+	{
+		xOffset += 40;
+	}
+	
+	sf::RectangleShape barrel(sf::Vector2f(70.f, 6.f));
+	barrel.setPosition(xpos+xOffset, ypos+yOffset);
+	barrel.setFillColor(GunGrey);
+	barrel.setOutlineColor(black);
+	barrel.setOutlineThickness(1);
+	barrel.setRotation(theta);
+	window->draw(barrel);
+	
+	sf::RectangleShape scope(sf::Vector2f(20.f, 6.f));
+	scope.setPosition(xpos+xOffset+15+xScope, ypos+yOffset-5+yScope);
+	scope.setFillColor(GunGrey);
+	scope.setOutlineColor(black);
+	scope.setOutlineThickness(1);
+	scope.setRotation(theta);
+	window->draw(scope);
+}
+
+void weapon::drawShotgun(sf::RenderWindow* window)
+{
+	sf::Color GunGrey  	{100, 100, 100};
+	sf::Color bandGrey 	{ 80,  80,  80};
+	sf::Color black    	{  0,   0,   0};
+	sf::Color handleBrown   { 87,  65,  47};
+	sf::Color white         {255, 255, 255};
+	int xOffset = 30;
+	int yOffset = 30;
+	
+	int xScope = 0;
+	int yScope = 0;
+
+	float theta = 0;
+	if(RIGHTpressed && UPpressed)
+	{
+		yOffset -= 13;
+		xScope += 10;
+		yScope -= 10;
+		theta = 315;
+	}
+	else if(RIGHTpressed && DOWNpressed)
+	{
+		xOffset += 35;
+		yOffset += 40;
+		yScope += 10;
+
+		theta = 45;
+	}
+	else if(LEFTpressed && UPpressed)
+	{
+		xOffset -= 10;
+		yOffset -= 10;
+		xScope -= 20;
+		yScope -= 5;
+		theta = 225;
+	}
+	else if(LEFTpressed && DOWNpressed)
+	{
+		xOffset -= 10;
+		xScope -= 30;
+		yOffset += 10;
+		yScope += 30;
+
+		theta = 135;
+	}
+	else if(LEFTpressed)
+	{
+		xOffset -= 20;
+		xScope -= 34;
+		yScope += 10;
+		theta = 180;
+	}
+	else if(UPpressed)
+	{
+		yOffset -= 30;
+		xScope -= 20;
+		theta = 270;
+	}
+	else if(DOWNpressed)
+	{
+		theta = 90;
+		yOffset += 40;
+		xScope -= 10;
+		yScope += 25;
+	}
+	else
+	{
+		xOffset += 40;
+	}
+
+	sf::RectangleShape scope(sf::Vector2f(30.f, 6.f));
+	scope.setPosition(xpos+xOffset+15+xScope, ypos+yOffset-5+yScope);
+	scope.setFillColor(GunGrey);
+	scope.setOutlineColor(black);
+	scope.setOutlineThickness(1);
+	scope.setRotation(theta);
+	window->draw(scope);
+
+	sf::RectangleShape barrel(sf::Vector2f(60.f, 6.f));
+	barrel.setPosition(xpos+xOffset, ypos+yOffset);
+	barrel.setFillColor(GunGrey);
+	barrel.setOutlineColor(black);
+	barrel.setOutlineThickness(1);
+	barrel.setRotation(theta);
+	window->draw(barrel);
+	
+}
+
+void weapon::drawHeldWeapon(sf::RenderWindow* window)
+{
+	//xpos = mainChar.xpos;
+	//ypos = mainChar.ypos;
+
+	if(gameclock % (5 *firerate) == 0)
+	{
+		animation = !animation;
+	}
+	
+	if(itemType != 'W')
+	{
+		return;
+	}
+	switch(style)
+	{
+		case 'L':
+			{
+				drawLaser(window);
+				break;				
+			}
+		case 'M':
+			{
+				drawMiniGun(window);
+				break;
+			}
+		case 'S':
+			{
+				drawShotgun(window);	
+				break;
+			}
+		case 'R':
+			{
+				drawRifle(window);				
+				break;
+			}
+	}
+
+
+}
+
 void weapon::drawItem(sf::RenderWindow* window)
 {
 

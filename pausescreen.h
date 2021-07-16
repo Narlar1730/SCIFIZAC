@@ -46,6 +46,8 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 	Player inventPlayer = mainChar;
 	inventPlayer.xpos = 380;
 	inventPlayer.ypos = 380;
+	inventPlayer.EquippedGun.xpos = 380;
+	inventPlayer.EquippedGun.ypos = 380;
 	inventPlayer.drawPlayer(window);
 
 	//Draw Pettttts
@@ -253,7 +255,8 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == i)
 		{
 			swapWeapon(highlightedBox, mainChar.CurSel);
-			mainChar.CurSel = -1;	
+			mainChar.CurSel = -1;
+			mainChar.EquippedGun = inventory[24];	
 						
 		}
 		if(mainChar.CurSel == i)

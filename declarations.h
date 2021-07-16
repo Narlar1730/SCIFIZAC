@@ -24,6 +24,7 @@ class SlimeKing {
 	public:
 		int xpos, ypos, curRadius, init_size, r, g, b;
 		int hitCounter = 0;
+		int attackCounter = 0;
 		int health = init_size*10;
 		int speed = 10;
 		bool growing;
@@ -73,9 +74,14 @@ class weapon{
 		int damage, firerate, range, bulletSize, bulletSpeed, extra, xpos, ypos;
 		int inventoryIndex = -1;
 		char itemType;
+		bool animation = false;
 		string name;
 		char style, rarity;
 		void FireWeapon();
+		void drawShotgun(sf::RenderWindow*);
+		void drawRifle(sf::RenderWindow*);
+		void drawMiniGun(sf::RenderWindow*);
+		void drawLaser(sf::RenderWindow*);
 		void drawHeldWeapon(sf::RenderWindow*);
 		void drawItem(sf::RenderWindow*);
 		void drawGroundWeapon(sf::RenderWindow*);
@@ -114,4 +120,7 @@ class Map{
 		void               genRandMap();        // Generate Random Map
 		void		   genSpecMap(char type);
 		void		   openDoors();
+		//Different Maps!
+		void		   randomPieceMap();
+		void		   swirlyPieceMap();
 };

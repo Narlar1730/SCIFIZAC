@@ -224,10 +224,28 @@ void generateFloor()
 	}
 }
 
+void Map::genRandMap()
+{
+	vector<char> randomMaps {'R', 'S'};
+	int which = rand() % randomMaps.size();
+	char toMake = randomMaps[which];
+	switch(toMake)
+	{
+		case 'R':
+			randomPieceMap();
+			break;
+		case 'S':
+			swirlyPieceMap();
+			break;
+	}
+
+}
+
+
 void Map::genSpecMap(char type)
 {
 	vector<char> around = getSurroundingRooms();
-	
+	//Draw outside walls.	
 	for(int i = 0; i < 18; i++)
 	{
 		for(int j = 0; j < 2; j++)
@@ -334,65 +352,8 @@ void Map::genSpecMap(char type)
 			}
 		case 'R':
 			{
-				int numObst = rand() % 3 + 1;
-				for(int i = 0; i < numObst; i++)
-				{
-					int rand1 = (rand()%14)*100 + 200;
-					int rand2 = (rand()%14)*100 + 200;
-
-					obstacle wall;
-					wall.xpos = rand1;
-					wall.ypos = rand2;
-					wall.type = 'W';
-					pieces.push_back(wall);
-				}
-				// Add slimes
-				for(int i = 0; i < 2; i++)
-				{
-					for(int j = 0; j < 2; j++)
-					{
-						SlimeEnemy curslime;
-						int radius = rand() % 30 + 20;
-						int r      = rand() % 255;
-						int g      = rand() % 255;
-						int b      = rand() % 255;
-
-						curslime.xpos      = 800 + i*100;
-						curslime.ypos      = 800 + j*11;
-						curslime.curRadius = radius;
-						curslime.init_size = radius;
-						curslime.r         = r;
-						curslime.g         = g;
-						curslime.b         = b;
-						curslime.health    = 10*radius;
-			
-						SlimeEnemies.push_back(curslime);
-				
-					}
-				}
-
-				// Add tanks
-				for(int i = 0; i < 2; i++)
-				{
-					for(int j = 0; j <2; j++)
-					{
-						
-						tankEnemy curTank;
-						int radius = rand() % 20 + 40;
-						int xpos   = 150 + i * 1460;
-						int ypos   = 150 + j * 1460;
-						int colour = rand() % 255;
-
-						curTank.curRadius = radius;
-						curTank.xpos      = xpos;
-						curTank.ypos      = ypos;
-						curTank.r         = colour;
-						curTank.g         = colour;
-						curTank.b         = colour;
-			
-						TankEnemies.push_back(curTank);
-					}
-				}
+				genRandMap();
+				break;
 			}				
 	
 	}
@@ -404,9 +365,49 @@ void Map::genSpecMap(char type)
 
 }
 
-void Map::genRandMap()
+void Map::swirlyPieceMap()
 {
-	//Draw Random Map
+	for(int i = 0; i < 12; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			obstacle wall;
+			wall.xpos = 300+1100*j;
+			wall.ypos = 300+i*100;
+			wall.type = 'W';
+			pieces.push_back(wall);
+		}
+	}
+	for(int i = 0; i < 12; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			obstacle wall;
+			wall.xpos = 600+500*j;
+			wall.ypos = 300+i*100;
+			wall.type = 'W';
+			pieces.push_back(wall);
+			if(i == 4 && j==1)
+			{
+				i+=2;
+			}
+		}
+	}
+	for(int i = 0; i<5; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			obstacle wall;
+			wall.xpos = 700+i*100;
+			wall.ypos = 300+j*1100;
+			wall.type = 'W';
+			pieces.push_back(wall);
+		}
+	}
+}
+
+void Map::randomPieceMap()
+{
 	int numObst = rand() % 3 + 1;
 	for(int i = 0; i < numObst; i++)
 	{
@@ -419,22 +420,6 @@ void Map::genRandMap()
 		wall.type = 'W';
 		pieces.push_back(wall);
 	}
-	for(int i = 0; i < 18; i++)
-	{
-		for(int j = 0; j < 2; j++)
-		{
-			obstacle wall;
-			wall.xpos = i*100;
-			wall.ypos = j*1700;
-			wall.type = 'W';
-			pieces.push_back(wall);
-
-			wall.xpos = j*1700;
-			wall.ypos = i*100;
-			pieces.push_back(wall);
-		}
-	}
-	
 	// Add slimes
 	for(int i = 0; i < 2; i++)
 	{
@@ -446,8 +431,8 @@ void Map::genRandMap()
 			int g      = rand() % 255;
 			int b      = rand() % 255;
 
-			curslime.xpos      = 100 + i*1560;
-			curslime.ypos      = 100 + j*1560;
+			curslime.xpos      = 800 + i*100;
+			curslime.ypos      = 800 + j*11;
 			curslime.curRadius = radius;
 			curslime.init_size = radius;
 			curslime.r         = r;
@@ -456,39 +441,32 @@ void Map::genRandMap()
 			curslime.health    = 10*radius;
 
 			SlimeEnemies.push_back(curslime);
-			
+	
 		}
 	}
 
 	// Add tanks
-	for(int i = 0; i < 3; i++)
+	for(int i = 0; i < 2; i++)
 	{
-		for(int j = 0; j <3; j++)
+		for(int j = 0; j <2; j++)
 		{
-			if(i != j)
-			{
-				tankEnemy curTank;
-				int radius = rand() % 20 + 40;
-				int xpos   = 100 + i * 780;
-				int ypos   = 100 + j * 780;
-				int colour = rand() % 255;
+			
+			tankEnemy curTank;
+			int radius = rand() % 20 + 40;
+			int xpos   = 150 + i * 1460;
+			int ypos   = 150 + j * 1460;
+			int colour = rand() % 255;
 
-				curTank.curRadius = radius;
-				curTank.xpos      = xpos;
-				curTank.ypos      = ypos;
-				curTank.r         = colour;
-				curTank.g         = colour;
-				curTank.b         = colour;
-				
-				TankEnemies.push_back(curTank);
-			}
+			curTank.curRadius = radius;
+			curTank.xpos      = xpos;
+			curTank.ypos      = ypos;
+			curTank.r         = colour;
+			curTank.g         = colour;
+			curTank.b         = colour;
+
+			TankEnemies.push_back(curTank);
 		}
 	}
 
-	//Set master lists
-	SlimeList = SlimeEnemies;
-	TankList  = TankEnemies;
-	mapPiece  = pieces;
-
-
 }
+

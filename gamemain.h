@@ -224,13 +224,13 @@ void playGameThread()
 				int Pxpos = AllProjectiles[j].xpos + Pradi;
 				int Pypos = AllProjectiles[j].ypos + Pradi;
 
-				if(circleIntercept(slimeX, slimeY, slimeR, Pxpos, Pypos, Pradi))
+				if(circleIntercept(slimeX-slimeR, slimeY-slimeR, slimeR, Pxpos, Pypos, Pradi))
 				{
 					SlimeKingList[i].hurtSlime(FirstGun.damage);
 					AllProjectiles[j].Alive = false;
 				}
 			}
-			if(circleIntercept(slimeX, slimeY, slimeR, mainChar.xpos, mainChar.ypos, 40))
+			if(circleIntercept(slimeX+slimeR, slimeY+slimeR, slimeR, mainChar.xpos, mainChar.ypos, 40))
 			{
 				mainChar.hurtPlayer(1);
 			}
@@ -493,9 +493,12 @@ void GameScreen(sf::RenderWindow* window)
 	
 	initInventory();
 	generateFloor();
-	FirstGun.setGun(500, 2, 150, 'R', 12, 0);
-	FirstGun.rarity = 'R';	
+	FirstGun.setGun(500, 10, 150, 'S', 12, 10);
+	FirstGun.animation = true;
+	FirstGun.rarity = 'R';
+	FirstGun.itemType = 'W';	
 	insertWeapon(FirstGun, 24);
+	mainChar.EquippedGun = FirstGun;
 	weapon SlimePet = initSlimePet();
 	SlimePet.extra = 0;
 	insertWeapon(SlimePet, 36);
@@ -655,9 +658,13 @@ char DrawGameScreen(int mousex, int mousey, bool MouseReleased, bool MouseDown, 
 		}
 	}
 
+	//Draw Player gun
+	//FirstGun.drawHeldWeapon(window);
+	
 	//Draw Player
 	mainChar.drawPlayer(window);
 	
+
 	//Draw Minimap
 	sf::RectangleShape minimap1(sf::Vector2f(250.f, 250.f));
 	minimap1.setPosition(1400, 150);
