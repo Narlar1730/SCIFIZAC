@@ -52,6 +52,26 @@ void Player::setInitValues(int x, int y)
 	painBuffer = 0;
 }
 
+void drawArmour(sf::RenderWindow* window, int xpos, int ypos, weapon head, weapon chest, weapon leggings, weapon boots)
+{
+	if(head.itemType == 'H')
+	{
+		drawWornHead(window, xpos, ypos, head);
+	}
+	if(chest.itemType == 'C')
+	{
+		drawWornChest(window, xpos, ypos, chest);
+	}
+	if(leggings.itemType == 'L')
+	{
+		drawWornLeggings(window, xpos, ypos, leggings);
+	}
+	if(boots.itemType == 'B')
+	{
+		drawWornBoots(window, xpos, ypos, boots);
+	}
+}
+
 void Player::drawPlayer(sf::RenderWindow* window)
 {
 	//Draw Player
@@ -80,57 +100,9 @@ void Player::drawPlayer(sf::RenderWindow* window)
 	EquippedGun.xpos = xpos;
 	EquippedGun.ypos = ypos;
 	EquippedGun.drawHeldWeapon(window);
+	
+
 	//FIXME
-	/*
-	bool DrawGun = false;
-	vector<int> angles = {};
-	int arrowsPressed = 0;
-	if(RIGHTpressed)
-	{
-		angles.push_back(0);	
-		DrawGun = true;
-		arrowsPressed+=1;
-	}
-	if(LEFTpressed)
-	{
-		angles.push_back(180);
-		DrawGun = true;
-		arrowsPressed+=1;
-	}
-	if(UPpressed)
-	{
-		angles.push_back(270);
-		DrawGun = true;
-		arrowsPressed+=1;
-	}
-	if(DOWNpressed)
-	{
-		angles.push_back(90);
-		DrawGun = true;
-		arrowsPressed+=1;
-	}
-	if(DrawGun and arrowsPressed < 3)
-	{
-		int angle = 0;
-		int len = angles.size();
-		for(int i = 0; i < len; i++)
-		{
-			angle += angles[i];
-		}	
-		angle = angle / len;
-		sf::RectangleShape gun(sf::Vector2f(55.f, 10.f));
-		gun.setPosition(xpos+35, ypos+35);
-		gun.setFillColor(GunGrey);
-		gun.setOutlineColor(black);
-		gun.setOutlineThickness(4);
-		if(RIGHTpressed && UPpressed)
-		{
-			angle = 315;
-		}
-		gun.setRotation(angle);
-		window->draw(gun);
-	}
-	*/
 	//Draw healthbar.
 	sf::RectangleShape backBar(sf::Vector2f(1500.f, 20.f));
 	backBar.setPosition(150, 1650);
@@ -147,6 +119,9 @@ void Player::drawPlayer(sf::RenderWindow* window)
 
 	//Draw objects in the right order
 	window->draw(circle);
+	
+	drawArmour(window, xpos, ypos, inventory[30], inventory[31], inventory[32], inventory[33]);
+
 	window->draw(backBar);
 	window->draw(healthBar);
 

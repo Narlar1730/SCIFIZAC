@@ -12,6 +12,8 @@
 #include <time.h>
 #include "declarations.h"
 #include "obstacles.h"
+#include "inventory.h"
+#include "armour.h"
 #include "player.h"
 //#include "slimeEnemy.h"
 using namespace std;
@@ -24,7 +26,6 @@ Player mainChar;
 int buttonClickTimer = 0;
 #include "weapon.h"
 #include "slimepet.h"
-#include "inventory.h"
 #include "pausescreen.h"
 #include "slimeEnemy.h"
 #include "tankEnemy.h"

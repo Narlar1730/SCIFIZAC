@@ -221,7 +221,17 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 			}
 			else if(mainChar.CurSel == 36)
 			{
+				//Petbox
 				if(inventory[highlightedBox].itemType == 'P' || inventory[highlightedBox].itemType == 'E')
+				{
+					swapWeapon(highlightedBox, mainChar.CurSel);
+					mainChar.CurSel = -1;
+				}
+			}
+			else if(mainChar.CurSel == 26)
+			{
+				//ArmourHeadBox
+				if(inventory[highlightedBox].itemType == 'H' || inventory[highlightedBox].itemType == 'E')
 				{
 					swapWeapon(highlightedBox, mainChar.CurSel);
 					mainChar.CurSel = -1;
@@ -269,7 +279,7 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 	}
 
 	//Draaaaaaaaaaaaaaw pet
-	
+		
 	if(inventory[36].itemType == 'P' || inventory[36].itemType == 'E')
 	{
 		weapon slimePet = inventory[36];
@@ -296,6 +306,115 @@ bool drawPauseScreen(int mousex, int mousey, bool MouseReleased, bool mouseDown,
 			slimePet.drawSlimePet(window);
 		}
 	}
+
+
+	//Draw Head armour
+	if(inventory[30].itemType == 'H' || inventory[30].itemType == 'E')
+	{
+		weapon curHead = inventory[30];
+		curHead.xpos = 1150+30+170;
+		curHead.ypos = 320+30;
+		if(mouseDown && highlightedBox == 30 && mainChar.CurSel == -1 && inventory[30].itemType != 'E')
+		{
+			mainChar.CurSel = 30;
+		}
+		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == 30 && (inventory[mainChar.CurSel].itemType == 'H' || inventory[mainChar.CurSel].itemType == 'E'))
+		{
+			swapWeapon(highlightedBox, mainChar.CurSel);
+			mainChar.CurSel = -1;
+		}
+
+		if(mainChar.CurSel == 30)
+		{
+			curHead.xpos = mousex;
+			curHead.ypos = mousey;
+		}
+		if(inventory[30].itemType == 'H')
+		{
+			curHead.drawGroundWeapon(window);
+		}
+	}
+	//Draw Chest Armour
+	if(inventory[31].itemType == 'C' || inventory[31].itemType == 'E')
+	{
+		weapon curHead = inventory[31];
+		curHead.xpos = 1150+30+170;
+		curHead.ypos = 320+30+170;
+		if(mouseDown && highlightedBox == 31 && mainChar.CurSel == -1 && inventory[31].itemType != 'E')
+		{
+			mainChar.CurSel = 31;
+		}
+		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == 31 && (inventory[mainChar.CurSel].itemType == 'C' || inventory[mainChar.CurSel].itemType == 'E'))
+		{
+			swapWeapon(highlightedBox, mainChar.CurSel);
+			mainChar.CurSel = -1;
+		}
+
+		if(mainChar.CurSel == 31)
+		{
+			curHead.xpos = mousex;
+			curHead.ypos = mousey;
+		}
+		if(inventory[31].itemType == 'C')
+		{
+			curHead.drawGroundWeapon(window);
+		}
+	}
+
+	//Draw Leggings
+	if(inventory[32].itemType == 'L' || inventory[32].itemType == 'E')
+	{
+		weapon curHead = inventory[32];
+		curHead.xpos = 1150+30+170;
+		curHead.ypos = 320+30+2*170;
+		if(mouseDown && highlightedBox == 32 && mainChar.CurSel == -1 && inventory[32].itemType != 'E')
+		{
+			mainChar.CurSel = 32;
+		}
+		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == 32 && (inventory[mainChar.CurSel].itemType == 'L' || inventory[mainChar.CurSel].itemType == 'E'))
+		{
+			swapWeapon(highlightedBox, mainChar.CurSel);
+			mainChar.CurSel = -1;
+		}
+
+		if(mainChar.CurSel == 32)
+		{
+			curHead.xpos = mousex;
+			curHead.ypos = mousey;
+		}
+		if(inventory[32].itemType == 'L')
+		{
+			curHead.drawGroundWeapon(window);
+		}
+	}
+
+	//Draw Boots Armour
+	if(inventory[33].itemType == 'B' || inventory[33].itemType == 'E')
+	{
+		weapon curHead = inventory[33];
+		curHead.xpos = 1150+30+170;
+		curHead.ypos = 320+30+3*170;
+		if(mouseDown && highlightedBox == 33 && mainChar.CurSel == -1 && inventory[33].itemType != 'E')
+		{
+			mainChar.CurSel = 33;
+		}
+		else if(MouseReleased && mainChar.CurSel != -1 && highlightedBox == 33 && (inventory[mainChar.CurSel].itemType == 'B' || inventory[mainChar.CurSel].itemType == 'E'))
+		{
+			swapWeapon(highlightedBox, mainChar.CurSel);
+			mainChar.CurSel = -1;
+		}
+
+		if(mainChar.CurSel == 33)
+		{
+			curHead.xpos = mousex;
+			curHead.ypos = mousey;
+		}
+		if(inventory[33].itemType == 'B')
+		{
+			curHead.drawGroundWeapon(window);
+		}
+	}
+
 	/*if(MouseReleased)
 	{
 		printItems();
