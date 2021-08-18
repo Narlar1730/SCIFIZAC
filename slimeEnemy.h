@@ -89,91 +89,89 @@ void SlimeEnemy::spawnSlime(int x, int y)
 	xpos = x;
 	ypos = y;
 
+	xVel = rand() % 7 - 3;
+	yVel = rand() % 7 - 3;
+
+	vector<int> vels = velocityFix(xVel, yVel, 3);
+	
+	xVel = vels[0];
+	yVel = vels[1];
+
 	curRadius = rand() % 30 + 20;
 	init_size = curRadius;
 
 	hitCounter = 0;
 }
 
+bool OverlapRectangles(int R1X1, int R1Y1, int R2X1, int R2Y1, int R1X2, int R1Y2, int R2X2, int R2Y2)
+{
+	bool output = true;
+
+	if (R1X1 >= R2X2 || R2X1 >= R1X2)
+	{
+		output = false;
+	}
+	if(R1Y1 >= R2Y2 || R2Y1 >= R1Y2)
+	{
+		output = false;
+	}
+
+	return output;
+}
+
 void SlimeEnemy::moveSlime()
 {
-	int xDir = mainChar.xpos;
-	int yDir = mainChar.ypos;
 	//Move slimear
 	//
 	//Angle betwen slime and player = theta	
-	double theta = 0;
 	
-	theta = atan((static_cast<double>(ypos) - static_cast<double>(yDir))/(static_cast<double>(xpos) - static_cast<double>(xDir)));
+	//theta = atan((static_cast<double>(ypos) - static_cast<double>(yDir))/(static_cast<double>(xpos) - static_cast<double>(xDir)));
 
-	if(hitCounter == 0 && gameclock % 4 == 0)
-	{	
-		int yVelo = abs(static_cast<int>(3*sin(theta)));
-		int xVelo = abs(static_cast<int>(3*cos(theta)));
-		if(xDir > xpos) 
-		{
-			xpos += xVelo;
-		}
-		else if(xDir < xpos)
-		{
-			xpos -= xVelo;
-		}
-		if(yDir > ypos)
-		{
-			ypos += yVelo;
-		}
-		else if(yDir < ypos)
-		{
-			ypos -= yVelo;
-		}
-	}
-	else if(gameclock % 4 == 0)
+	if(gameclock % 4 == 0)
 	{
-		int yVelo = abs(static_cast<int>(3*sin(theta)));
-		int xVelo = abs(static_cast<int>(3*cos(theta)));
-		if(xDir > xpos) 
+		int numObsts = mapPiece.size();
+		for(int i = 0; i < numObsts; i++)
 		{
-			xpos -= 2*xVelo;
-		}
-		else if(xDir < xpos)
-		{
-			xpos += 2*xVelo;
-		}
-		if(yDir > ypos)
-		{
-			ypos -= 2*yVelo;
-		}
-		else if(yDir < 2*ypos)
-		{
-			ypos += 2*yVelo;
-		}
-		hitCounter -= 2;
+			obstacle curObst = mapPiece[i];
+			int rectX1 = curObst.xpos-10;
+			int rectY1 = curObst.ypos-10;
+			int size = 120;
+			int rectX2 = rectX1 + size;
+			int rectY2 = rectY1 + size;
 
+			int xpos2 = xpos + 2*init_size;
+			int ypos2 = ypos + 2*init_size;
+
+			bool overlap = OverlapRectangles(rectX1, rectY1, xpos, ypos, rectX2, rectY2, xpos2, ypos2);
+			
+			if(overlap){
+				if(rectX1+1 <= xpos2 || xpos <= rectX2)
+				{
+					xVel = xVel*-1;
+					xpos += xVel;
+				}
+				if(rectY1+1 <= ypos2 || ypos <= rectY2)
+				{
+					yVel = yVel*-1;
+					ypos += yVel;
+				}
+				
+			}
+				
+
+		}
+		//perform collisions
+
+		//cout xpos
+		/*cout << "xpos: " << xpos << " ypos: " << ypos << "\n";
+		cout << "xvel: " << xVel << " yVel: " << yVel << "\n";
+		cout << "-------------------------\n";*/
+		xpos += xVel;
+		ypos += yVel;
 	}
-
-	/*else
-	{
-		if(xDir > xpos)
-		{
-			xpos -= 1;
-		}
-		else
-		{
-			xpos += 1;
-		}
-		if(yDir > ypos)
-		{
-			ypos -= 1;
-		}
-		else
-		{
-			ypos += 1;
-		}
-		hitCounter -= 1;
-	}*/
-
 
 	//Change size
+
 	if(gameclock % 15 == 0)
 	{
 		if(curRadius == init_size)

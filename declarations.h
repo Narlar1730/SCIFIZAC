@@ -1,6 +1,6 @@
 class SlimeEnemy {
 	public:
-		int xpos, ypos, curRadius, init_size, r, g, b;
+		int xpos, ypos, curRadius, init_size, r, g, b, xVel, yVel;
 		int hitCounter = 0;
 		int health = init_size*10;
 		int speed = 10;
@@ -88,8 +88,13 @@ class weapon{
 		void setGun(int, int, int, char, int, int);
 		void drawStats(int, int, sf::RenderWindow*);
 		//Change this to something else?
+		//
+		//Handle Pets
 		void drawSlimePet(sf::RenderWindow*);
 		void moveSlimePet();
+
+		//Handle Armour
+		void drawCyborgArmour(sf::RenderWindow*);
 };
 
 class obstacle{

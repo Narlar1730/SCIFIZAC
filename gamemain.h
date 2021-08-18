@@ -102,7 +102,7 @@ void playGameThread()
 			}
 		}
 	}
-
+	
 	if(inventory[36].itemType == 'P')
 	{
 		weapon curWep = inventory[36];
@@ -110,6 +110,46 @@ void playGameThread()
 		curWep.ypos = mainChar.ypos - 50;
 		inventory[36] = curWep;
 	}
+	
+	//BEGIN cyborg testing
+	weapon CyborgMask;
+	CyborgMask.rarity='U';
+	CyborgMask.xpos = 300;
+	CyborgMask.ypos = 300;
+
+	CyborgMask.itemType='H';
+	CyborgMask.style   ='C';
+	
+	GroundWeapons.push_back(CyborgMask);
+	
+	weapon CyborgChest;
+	CyborgChest.rarity='U';
+	CyborgChest.xpos = 300;
+	CyborgChest.ypos = 400;
+	CyborgChest.itemType='C';
+	CyborgChest.style   ='C';
+
+	GroundWeapons.push_back(CyborgChest);
+
+	weapon CyborgPants;
+	CyborgPants.rarity='U';
+	CyborgPants.xpos = 300;
+	CyborgPants.ypos = 500;
+	CyborgPants.itemType='L';
+	CyborgPants.style   ='C';
+	
+	GroundWeapons.push_back(CyborgPants);
+
+	weapon CyborgBoots;
+	CyborgBoots.rarity='U';
+	CyborgBoots.xpos = 300;
+	CyborgBoots.ypos = 600;
+	CyborgBoots.itemType='B';
+	CyborgBoots.style   ='C';
+
+	GroundWeapons.push_back(CyborgBoots);
+
+	//End cyborgTest
 	//FirstGun.setGun(500, 50, 150, 'R', 12, 0);
 	//FirstGun.rarity = 'R';
 	int index = 0;
@@ -165,7 +205,51 @@ void playGameThread()
 			FirstSlime.spawnSlime();
 			SlimeList.push_back(FirstSlime);
 		}*/
-		
+		// Update Slime Kings
+		int numKings = SlimeKingList.size();
+		for(int i = 0; i < numKings; i++)
+		{
+			SlimeKingList[i].moveSlime();
+			SlimeKing CurKing = SlimeKingList[i];
+			int slimeR = CurKing.curRadius;
+			int slimeX = CurKing.xpos;
+			int slimeY = CurKing.ypos;
+			for(int j = 0; j < NumProjectiles; j++)
+			{
+				//FIXME
+				int Pradi = AllProjectiles[j].radius;
+				int Pxpos = AllProjectiles[j].xpos + Pradi;
+				int Pypos = AllProjectiles[j].ypos + Pradi;
+
+				if(circleIntercept(slimeX+slimeR, slimeY+slimeR, slimeR, Pxpos, Pypos, Pradi))
+				{
+					SlimeKingList[i].hurtSlime(FirstGun.damage);
+					AllProjectiles[j].Alive = false;
+				}
+			}
+			if(circleIntercept(slimeX+slimeR, slimeY+slimeR, slimeR+5, mainChar.xpos, mainChar.ypos, 40))
+			{
+				mainChar.hurtPlayer(1);
+			}
+			if(SlimeKingList[i].health > 0)
+			{
+				slimeKingVec.push_back(SlimeKingList[i]);
+			}
+			else
+			{
+				int DropChance = 10;
+				int roll100 = rand() % 100;
+				weapon SlimePet = initSlimePet();
+				SlimePet.xpos = slimeX;
+				SlimePet.ypos = slimeY;
+				GroundWeapons.push_back(SlimePet);
+				if(roll100 < DropChance)
+				{
+					spawnRandomGun(slimeX, slimeY);
+				}
+			}
+	
+		}
 		// Update slime position
 		int numSlimes = SlimeList.size();
 		
@@ -207,55 +291,11 @@ void playGameThread()
 				}
 			}
 		}
-
-		// Update Slime Kings
-		int numKings = SlimeKingList.size();
-		for(int i = 0; i < numKings; i++)
-		{
-			SlimeKingList[i].moveSlime();
-			SlimeKing CurKing = SlimeKingList[i];
-			int slimeR = CurKing.curRadius;
-			int slimeX = CurKing.xpos;
-			int slimeY = CurKing.ypos;
-			for(int j = 0; j < NumProjectiles; j++)
-			{
-				//FIXME
-				int Pradi = AllProjectiles[j].radius;
-				int Pxpos = AllProjectiles[j].xpos + Pradi;
-				int Pypos = AllProjectiles[j].ypos + Pradi;
-
-				if(circleIntercept(slimeX-slimeR, slimeY-slimeR, slimeR, Pxpos, Pypos, Pradi))
-				{
-					SlimeKingList[i].hurtSlime(FirstGun.damage);
-					AllProjectiles[j].Alive = false;
-				}
-			}
-			if(circleIntercept(slimeX+slimeR, slimeY+slimeR, slimeR, mainChar.xpos, mainChar.ypos, 40))
-			{
-				mainChar.hurtPlayer(1);
-			}
-			if(SlimeKingList[i].health > 0)
-			{
-				slimeKingVec.push_back(SlimeKingList[i]);
-			}
-			else
-			{
-				int DropChance = 10;
-				int roll100 = rand() % 100;
-				weapon SlimePet = initSlimePet();
-				SlimePet.xpos = slimeX;
-				SlimePet.ypos = slimeY;
-				GroundWeapons.push_back(SlimePet);
-				if(roll100 < DropChance)
-				{
-					spawnRandomGun(slimeX, slimeY);
-				}
-			}
-	
-		}
 		SlimeKingList = slimeKingVec;
 		SlimeList = slimeVec;
-		// Update Tanks
+
+
+				// Update Tanks
 		int numTanks = TankList.size();
 		for(int i = 0; i < numTanks; i++)
 		{

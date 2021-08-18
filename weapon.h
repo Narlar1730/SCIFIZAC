@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "cyborgArmour.h"
 
 using namespace std;
 
@@ -828,10 +829,40 @@ void weapon::drawItem(sf::RenderWindow* window)
 		if(style == 'S')
 		{
 			drawSlimePet(window);
-			return;
+		}
+		return;
+	}
+	else if(itemType == 'H')
+	{
+		if(style == 'C')
+		{
+			drawCyborgArmour(window);
+		}
+		return;
+	}
+	else if(itemType == 'C')
+	{
+		if(style == 'C')
+		{
+			drawCyborgArmour(window);
+		}
+		return;
+	}
+	else if(itemType == 'L')
+	{
+		if(style == 'C')
+		{
+			drawCyborgArmour(window);
+		}
+		return;
+	}
+	else if(itemType == 'B')
+	{
+		if(style == 'C')
+		{
+			drawCyborgArmour(window);
 		}
 	}
-
 
 	//Here we draw the weapons
 	switch(style)

@@ -404,6 +404,33 @@ void Map::swirlyPieceMap()
 			pieces.push_back(wall);
 		}
 	}
+
+	// Add slimes
+	
+	for(int i = 0; i < 2; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			SlimeEnemy curslime;
+			curslime.spawnSlime();
+			int radius = rand() % 30 + 20;
+			int r      = rand() % 255;
+			int g      = rand() % 255;
+			int b      = rand() % 255;
+
+			curslime.xpos      = 800 + i*100;
+			curslime.ypos      = 800 + j*11;
+			curslime.curRadius = radius;
+			curslime.init_size = radius;
+			curslime.r         = r;
+			curslime.g         = g;
+			curslime.b         = b;
+			curslime.health    = 10*radius;
+
+			SlimeEnemies.push_back(curslime);
+	
+		}
+	}
 }
 
 void Map::randomPieceMap()
@@ -426,6 +453,7 @@ void Map::randomPieceMap()
 		for(int j = 0; j < 2; j++)
 		{
 			SlimeEnemy curslime;
+			curslime.spawnSlime();
 			int radius = rand() % 30 + 20;
 			int r      = rand() % 255;
 			int g      = rand() % 255;
